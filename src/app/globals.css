@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,300;1,8..60,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-parchment-50 text-ink-800 font-body antialiased;
+    @apply dark:bg-ink-950 dark:text-parchment-200;
+  }
+
+  ::selection {
+    @apply bg-accent-terracotta/30 text-ink-900;
+    @apply dark:bg-accent-ochre/30 dark:text-parchment-100;
+  }
+}
+
+@layer utilities {
+  /* Animation initial states - prevents flash before animation */
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-stagger-1,
+  .animate-stagger-2,
+  .animate-stagger-3,
+  .animate-stagger-4,
+  .animate-stagger-5,
+  .animate-stagger-6 {
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+}
+
+@layer components {
+  .link-underline {
+    @apply relative inline-block;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-[1px] bg-current scale-x-0 origin-right transition-transform duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply scale-x-100 origin-left;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-1 shadow-lg shadow-ink-900/5;
+    @apply dark:shadow-ink-950/50;
+  }
+
+  .grain-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    @apply opacity-[0.03] dark:opacity-[0.05];
+  }
+}
+
+.hljs {
+  @apply bg-ink-900 text-parchment-200 rounded-lg p-4 overflow-x-auto;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in {
+  @apply text-accent-ochre;
+}
+
+.hljs-string,
+.hljs-attr {
+  @apply text-accent-sage;
+}
+
+.hljs-comment {
+  @apply text-ink-500 italic;
+}
+
+.hljs-function,
+.hljs-title {
+  @apply text-parchment-300;
+}
+
+.hljs-number,
+.hljs-literal {
+  @apply text-accent-terracotta;
+}
+
+.hljs-variable,
+.hljs-params {
+  @apply text-parchment-400;
+}
+
+/* Prose customizations */
+.prose pre {
+  @apply bg-ink-900 border border-ink-700/50;
+}
+
+.prose a {
+  @apply no-underline font-medium transition-colors duration-200;
+}
+
+.prose a:hover {
+  @apply text-accent-terracotta dark:text-accent-ochre;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-accent-terracotta dark:border-accent-ochre;
+  @apply bg-parchment-100/50 dark:bg-ink-900/30 py-1 px-4 rounded-r-lg;
+  @apply not-italic;
+}
+
+.prose blockquote p {
+  @apply italic;
+}
+
+.prose img {
+  @apply rounded-xl shadow-md;
+}
+
+.prose hr {
+  @apply border-ink-200 dark:border-ink-700;
+}
+
+.prose table {
+  @apply my-0;
+}
+
+.prose li strong,
+.prose ul strong,
+.prose ol strong {
+  @apply font-semibold text-ink-900 dark:text-parchment-100;
+}
+
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-parchment-100 dark:bg-ink-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-ink-300 dark:bg-ink-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-ink-400 dark:bg-ink-500;
+}
+

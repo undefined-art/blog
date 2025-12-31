@@ -2,18 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
+import type { BlogPost, BlogPostMeta } from './types';
 
-export type BlogPost = {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  readingTime: string;
-  content: string;
-};
-
-export type BlogPostMeta = Omit<BlogPost, 'content'>;
+export type { BlogPost, BlogPostMeta } from './types';
 
 const POSTS_DIR = path.join(process.cwd(), 'content/articles');
 
@@ -69,13 +60,16 @@ export const getPostBySlug = (slug: string): BlogPost | null => {
   };
 };
 
-export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
+export { formatDate } from './utils';
+
+export const getAllTags = (): string[] => {
+  const posts = getAllPosts();
+  const tagsSet = new Set<string>();
   
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  posts.forEach((post) => {
+    post.tags.forEach((tag) => tagsSet.add(tag));
   });
+  
+  return Array.from(tagsSet).sort();
 };
 

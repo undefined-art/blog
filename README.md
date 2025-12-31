@@ -10,9 +10,9 @@ npm run dev
 
 Open [http://localhost:3000/blog/](http://localhost:3000/blog/) to see your blog.
 
-## 📝 Writing Posts
+## 📝 Writing Articles
 
-Create new posts in the `content/posts/` directory:
+Create new articles in the `content/articles/` directory:
 
 ```mdx
 ---
@@ -71,33 +71,6 @@ const nextConfig = {
 ```
 
 3. Push and the blog will be at `https://{username}.github.io/`
-
-## 📁 Project Structure
-
-```
-blog/
-├── content/posts/       # Blog posts (MDX files)
-├── src/
-│   ├── app/            # Next.js App Router pages
-│   ├── components/     # React components
-│   └── lib/            # Utility functions
-├── .github/workflows/  # GitHub Actions deployment
-└── next.config.mjs     # Next.js configuration
-```
-
-## 🎨 Customization
-
-### Colors
-
-Edit `tailwind.config.ts` to customize the color palette.
-
-### Site Info
-
-Update `src/app/layout.tsx` with your information.
-
-### About Page
-
-Edit `src/app/about/page.tsx` with your bio and details.
 
 ---
 

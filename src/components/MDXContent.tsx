@@ -18,22 +18,18 @@ const escapeHtml = (text: string): string => {
 const parseInlineFormatting = (text: string): string => {
   let result = text;
 
-  // Inline code
   result = result.replace(
     /`([^`]+)`/g,
     '<code class="font-mono text-sm bg-parchment-200 dark:bg-ink-800 px-1.5 py-0.5 rounded text-accent-terracotta dark:text-accent-ochre">$1</code>'
   );
 
-  // Bold
   result = result.replace(
     /\*\*(.+?)\*\*/g,
     '<strong class="font-semibold text-ink-900 dark:text-parchment-100">$1</strong>'
   );
 
-  // Italic
   result = result.replace(/\*(.+?)\*/g, '<em>$1</em>');
 
-  // Links
   result = result.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
     '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-accent-terracotta dark:text-accent-ochre hover:underline transition-colors duration-200">$1</a>'
@@ -98,11 +94,11 @@ const parseNumberedList = (listText: string): string => {
       const match = line.match(/^\d+\.\s*/);
       const itemContent = parseInlineFormatting(line.replace(/^\d+\.\s*/, ''));
 
-      return `<li class="flex items-start gap-3"><span class="text-accent-terracotta dark:text-accent-ochre font-semibold min-w-[1.5rem]">${Number(match?.[0] || 1)}.</span><span>${itemContent}</span></li>`;
+      return `<li class="flex items-start gap-3"><span class="text-accent-terracotta dark:text-accent-ochre font-semibold min-w-[0.5rem]">${Number(match?.[0] || 1)}.</span><span>${itemContent}</span></li>`;
     })
     .join('');
 
-  return `<ol class="space-y-2 my-4 text-ink-700 dark:text-parchment-300">${items}</ol>`;
+  return `<ol class="p-0 space-y-2 my-4 text-ink-700 dark:text-parchment-300">${items}</ol>`;
 };
 
 const parseBulletList = (listText: string): string => {
@@ -114,7 +110,7 @@ const parseBulletList = (listText: string): string => {
       return `<li class="flex items-start gap-3"><span class="text-accent-terracotta dark:text-accent-ochre">•</span><span>${itemContent}</span></li>`;
     })
     .join('');
-  return `<ul class="space-y-2 my-4 text-ink-700 dark:text-parchment-300">${items}</ul>`;
+  return `<ul class="p-0 space-y-2 my-4 text-ink-700 dark:text-parchment-300">${items}</ul>`;
 };
 
 export const MDXContent = ({ content }: MDXContentProps) => {

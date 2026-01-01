@@ -23,7 +23,7 @@ const HomePage = () => {
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-32 flex flex-col items-center justify-center min-h-[70vh]">
       <div className="text-center">
         <div className="mb-8 animate-scale-in">
-          <span className="text-6xl md:text-8xl animate-float inline-block">✦</span>
+          <span className="text-6xl md:text-8xl animate-bounce transition-all duration-300 inline-block">✦</span>
         </div>
         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-ink-900 dark:text-parchment-100 leading-tight animate-fade-in">
           undefined-art

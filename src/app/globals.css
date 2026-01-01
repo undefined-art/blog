@@ -9,6 +9,14 @@
     scroll-behavior: smooth;
   }
 
+  /* Smooth theme transitions */
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease !important;
+  }
+
   body {
     @apply bg-parchment-50 text-ink-800 font-body antialiased;
     @apply dark:bg-ink-950 dark:text-parchment-200;

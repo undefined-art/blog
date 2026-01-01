@@ -12,7 +12,7 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'dark',
-  toggleTheme: () => {},
+  toggleTheme: () => { },
   mounted: false,
 });
 
@@ -31,7 +31,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   useEffect(() => {
     setMounted(true);
     const savedTheme = localStorage.getItem('theme') as Theme | null;
-    
+
     if (savedTheme) {
       setTheme(savedTheme);
     }
@@ -39,7 +39,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     if (!mounted) return;
-    
+
     const root = document.documentElement;
 
     if (theme === 'dark') {
@@ -47,12 +47,20 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     } else {
       root.classList.remove('dark');
     }
-    
+
     localStorage.setItem('theme', theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {
+    const root = document.documentElement;
+
+    root.classList.add('theme-transition');
+
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+
+    setTimeout(() => {
+      root.classList.remove('theme-transition');
+    }, 300);
   };
 
   return (

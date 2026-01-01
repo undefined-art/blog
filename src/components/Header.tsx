@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { useTheme } from './ThemeProvider';
+import { useState } from 'react';
 
 export const Header = () => {
   const { theme, toggleTheme, mounted } = useTheme();
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleThemeToggle = () => {
     toggleTheme();
@@ -15,6 +18,10 @@ export const Header = () => {
       event.preventDefault();
       toggleTheme();
     }
+  };
+
+  const handleMenuToggle = () => {
+    setIsOpen(!isOpen);
   };
 
   return (
@@ -28,27 +35,29 @@ export const Header = () => {
           >
             ✦ Tech grove
           </Link>
-          <div className="flex items-center gap-8">
-            <Link
-              href="/articles/"
-              className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
-            >
-              Articles
-            </Link>
-            <Link
-              href="/about/"
-              className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
-            >
-              About
-            </Link>
-            <a
-              href="https://github.com/undefined-art"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
-            >
-              GitHub
-            </a>
+          <div className="flex items-center gap-2 md:gap-8">
+            <div className="hidden md:flex items-center gap-8">
+              <Link
+                href="/articles/"
+                className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
+              >
+                Articles
+              </Link>
+              <Link
+                href="/about/"
+                className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
+              >
+                About
+              </Link>
+              <a
+                href="https://github.com/undefined-art"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
+              >
+                GitHub
+              </a>
+            </div>
             <button
               onClick={handleThemeToggle}
               onKeyDown={handleKeyDown}
@@ -92,8 +101,24 @@ export const Header = () => {
                 </svg>
               )}
             </button>
+            <button
+              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-md
+         hover:bg-accent-terracotta/10 dark:hover:bg-accent-ochre/10 transition focus:outline-none" onClick={handleMenuToggle}>
+              <span className="block w-6 h-0.5 dark:bg-white bg-ink-900 transition-all duration-300 origin-center"></span>
+              <span className="block w-6 h-0.5 dark:bg-white bg-ink-900 my-1.5 transition-all duration-300"></span>
+              <span className="block w-6 h-0.5 dark:bg-white bg-ink-900 transition-all duration-300 origin-center"></span>
+            </button>
           </div>
         </div>
+        {isOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-parchment-50 dark:bg-ink-950 border-b border-ink-100 dark:border-ink-800">
+            <nav className="flex flex-col gap-4 p-4">
+              <Link href="/articles/" className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200">Articles</Link>
+              <Link href="/about/" className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200">About</Link>
+              <a href="https://github.com/undefined-art" target="_blank" rel="noopener noreferrer" className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200">GitHub</a>
+            </nav>
+          </div>
+        )}
       </nav>
     </header>
   );

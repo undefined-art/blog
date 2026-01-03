@@ -14,7 +14,7 @@ export const BlogCard = ({ post }: BlogCardProps) => {
         className="animate-stagger-3 block rounded-2xl md:hover:bg-parchment-100/50 dark:md:hover:bg-ink-900/50 transition-colors duration-300"
         aria-label={`Read article: ${post.title}`}
       >
-        <div className="mdhover:p-6 transition-all duration-300">
+        <div className="md:hover:p-6 transition-all duration-300">
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {post.tags.map((tag) => (

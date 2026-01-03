@@ -20,9 +20,9 @@ const staggerClasses = [
 
 const HomePage = () => {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16 md:py-32 flex flex-col items-center justify-center min-h-[70vh]">
+    <div className="max-w-4xl mx-auto px-6 py-16 md:py-12 flex flex-col items-center justify-center min-h-[70vh]">
       <div className="text-center">
-        <div className="mb-8 animate-scale-in">
+        <div className="mb-2 animate-scale-in">
           <span className="text-6xl md:text-8xl animate-bounce transition-all duration-300 inline-block">✦</span>
         </div>
         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-ink-900 dark:text-parchment-100 leading-tight animate-fade-in">

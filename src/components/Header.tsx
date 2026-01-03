@@ -49,14 +49,6 @@ export const Header = () => {
               >
                 About
               </Link>
-              <a
-                href="https://github.com/undefined-art"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
-              >
-                GitHub
-              </a>
             </div>
             <button
               onClick={handleThemeToggle}
@@ -115,7 +107,6 @@ export const Header = () => {
             <nav className="flex flex-col gap-4 p-4">
               <Link href="/articles/" className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200">Articles</Link>
               <Link href="/about/" className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200">About</Link>
-              <a href="https://github.com/undefined-art" target="_blank" rel="noopener noreferrer" className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200">GitHub</a>
             </nav>
           </div>
         )}

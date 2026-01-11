@@ -1,0 +1,172 @@
+---
+title: "PostgreSQL performance tricks and their hidden costs"
+description: "Speed up your database queries with prepared statements, indexing, partitioning, bulk imports, and replication. Learn when each technique shines—and when it backfires."
+date: "2026-01-11"
+tags: ["PostgreSQL", "Databases", "Performance", "Backend"]
+---
+
+Your queries are slow. Your users are complaining. You've heard about indexing, partitioning, and other magic words that supposedly fix everything. But here's the thing nobody tells you upfront: **every optimization comes with a trade-off.**
+
+Let's walk through five powerful PostgreSQL techniques that can dramatically speed up your queries—and the catches that might bite you if you're not careful.
+
+## 1. Prepared Statements: Skip the Planning Phase
+
+Every time you run a SQL query, PostgreSQL goes through two steps: **planning** (figuring out how to execute it) and **execution** (actually doing it). For simple queries, planning is fast. But when you're inserting thousands of rows in a loop, that planning overhead adds up.
+
+**Prepared statements** let you plan once and execute many times.
+
+```sql
+-- Create a reusable prepared statement
+PREPARE insert_event AS 
+INSERT INTO events (name, timestamp, payload)
+VALUES ($1, $2, $3);
+
+-- Execute it multiple times with different values
+EXECUTE insert_event('user_signup', '2025-01-15', '{"user_id": 42}');
+EXECUTE insert_event('page_view', '2025-01-15', '{"page": "/home"}');
+EXECUTE insert_event('purchase', '2025-01-15', '{"amount": 99.99}');
+```
+
+Think of it like a cookie cutter. Instead of designing a new cutter for every cookie, you make one and stamp it repeatedly.
+
+**The Catch:**
+
+- Prepared statements only exist for the **lifetime of your database session**. Close the connection, and they're gone.
+- They're **session-scoped**—other connections can't see or use them.
+- Performance gains diminish on tables with massive amounts of data where execution time dominates.
+
+**The Reality:** Most modern database drivers (like `pg` for Node.js or `psycopg2` for Python) handle prepared statements automatically. Unless you're doing something unusual, you're probably already benefiting from this without writing manual `PREPARE` statements.
+
+## 2. Indexing: The Biggest Performance Win
+
+If your table has millions of rows and your queries are crawling, **indexing** is probably your answer. Without an index, PostgreSQL performs a **sequential scan**—reading every single row to find what you need. That's like searching for a word in a book by reading every page.
+
+An index is like the book's table of contents. It tells PostgreSQL exactly where to look.
+
+```sql
+-- Create an index on the email column
+CREATE INDEX idx_users_email ON users(email);
+
+-- Now this query is fast
+SELECT * FROM users WHERE email = 'alice@example.com';
+```
+
+**The Catch:**
+
+Every time you `INSERT`, `UPDATE`, or `DELETE` a row, PostgreSQL must **update the index too**. This adds overhead to write operations. For write-heavy tables, too many indexes can actually slow things down.
+
+Indexes also consume **disk space** and require periodic maintenance (think `VACUUM` and `REINDEX`).
+
+**Index Types to Know:**
+
+| Index Type | Best For | Example Use Case |
+|------------|----------|------------------|
+| **B-tree** | Equality and range queries | `WHERE age > 25` |
+| **Hash** | Exact equality only | `WHERE id = 123` |
+| **GIN** | Full-text search, arrays, JSONB | `WHERE tags @> '{postgres}'` |
+| **GiST** | Geometric data, ranges | PostGIS spatial queries |
+| **BRIN** | Very large tables with natural ordering | Time-series data |
+
+**Pro Tip:** Use `EXPLAIN ANALYZE` to see if your queries are actually using your indexes. PostgreSQL might ignore them if it thinks a sequential scan is faster.
+
+## 3. Partitioning: Divide and Conquer
+
+When your table grows to hundreds of millions of rows, even indexes start struggling. **Partitioning** splits a massive table into smaller, more manageable pieces—while still letting you query it as if it were one table.
+
+The most common approach is **range partitioning** by date:
+
+```sql
+-- Create the parent table with partitioning
+CREATE TABLE events (
+    id uuid,
+    payload bytea,
+    created_at timestamp
+) PARTITION BY RANGE (created_at);
+
+-- Create individual partitions for each time range
+CREATE TABLE events_2025_01 
+PARTITION OF events
+FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
+
+CREATE TABLE events_2025_02 
+PARTITION OF events
+FOR VALUES FROM ('2025-02-01') TO ('2025-03-01');
+
+-- Query as usual—PostgreSQL routes to the right partition
+SELECT * FROM events
+WHERE created_at BETWEEN '2025-01-15' AND '2025-01-20';
+```
+
+PostgreSQL knows to only scan `events_2025_01`—it skips the other partitions entirely. This is called **partition pruning**.
+
+**The Catch:**
+
+- If your query doesn't filter by the partition key, PostgreSQL scans **all partitions**. That's slower than a single table.
+- You need to **create new partitions regularly**—typically via a cron job or scheduled task.
+- Cross-partition queries (like aggregations spanning months) can be slower than expected.
+- Managing dozens of partitions adds operational complexity.
+
+**When to Use It:** Partitioning shines for time-series data, logs, and analytics tables where you typically query recent data and can archive or drop old partitions.
+
+## 4. COPY: Bulk Insert on Steroids
+
+Inserting rows one at a time is painfully slow for large datasets. Each `INSERT` is a separate transaction with its own overhead. If you're loading millions of rows, use `COPY` instead.
+
+```sql
+-- Load data directly from a CSV file
+COPY events FROM '/path/to/data.csv' WITH (FORMAT csv, HEADER true);
+
+-- Or stream from STDIN for programmatic imports
+COPY events FROM STDIN WITH (FORMAT csv);
+```
+
+`COPY` bypasses the normal query processing pipeline and writes directly to the table. It's **orders of magnitude faster** than individual inserts—we're talking 10x to 100x improvement.
+
+**The Catch:**
+
+- The file must be accessible from the **PostgreSQL server**, not your client machine. For client-side files, use `\copy` in psql or your driver's copy functionality.
+- If **any row fails** (constraint violation, type mismatch), the entire operation aborts. No partial imports.
+- No row-level triggers fire during `COPY`.
+
+**When to Use It:** Initial data loads, ETL pipelines, migrating data between systems, or any scenario where you're inserting thousands of rows at once.
+
+## 5. Replication: Scale Reads with Replicas
+
+At some point, a single database server can't handle all your traffic. **Replication** creates copies of your database that can serve read queries, distributing the load.
+
+The typical setup:
+
+- **Primary (master):** Handles all writes (`INSERT`, `UPDATE`, `DELETE`)
+- **Replicas (read replicas):** Handle read queries (`SELECT`)
+
+This follows the **separation of concerns** principle—reads and writes have different scaling characteristics, so handle them separately.
+
+**The Catch:**
+
+- **Replication lag:** Replicas might be milliseconds (or seconds) behind the primary. A user writes data and immediately reads from a replica—they might not see their own changes.
+- **Operational complexity:** You're now managing multiple database instances, monitoring replication health, and handling failover scenarios.
+- **Connection routing:** Your application needs logic to send writes to the primary and reads to replicas.
+
+**When to Use It:** Read-heavy workloads (dashboards, reporting, APIs), when you need high availability, or when a single server's CPU/memory is maxed out.
+
+## Quick Reference
+
+| Technique | Best For | Watch Out For |
+|-----------|----------|---------------|
+| **Prepared Statements** | Repeated similar queries | Session-scoped, often automatic |
+| **Indexing** | Search and filter queries | Write overhead, disk space |
+| **Partitioning** | Massive time-series tables | Cross-partition queries, maintenance |
+| **COPY** | Bulk data imports | All-or-nothing, server-side files |
+| **Replication** | Read-heavy scaling | Lag, operational complexity |
+
+## The Takeaway
+
+There's no free lunch in database optimization. Every technique that speeds up one thing tends to slow down or complicate something else. The key is understanding your **actual workload**:
+
+- Read-heavy? Index aggressively and consider replicas.
+- Write-heavy? Be selective with indexes and use `COPY` for bulk loads.
+- Massive tables? Partition by a column you always filter on.
+- Simple repeated queries? Let your driver handle prepared statements.
+
+Start with the simplest solution that might work. Profile with `EXPLAIN ANALYZE`. Add complexity only when the numbers prove you need it.
+

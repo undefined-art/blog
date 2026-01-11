@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { formatDate } from '@/lib/utils';
+import { formatDate, resolveAssetPath } from '@/lib/utils';
 import type { BlogPostMeta } from '@/lib/types';
 
 type BlogCardProps = {
@@ -14,6 +14,16 @@ export const BlogCard = ({ post }: BlogCardProps) => {
         className="animate-stagger-3 block rounded-2xl md:hover:bg-parchment-100/50 dark:md:hover:bg-ink-900/50 transition-colors duration-300"
         aria-label={`Read article: ${post.title}`}
       >
+        {post.image && (
+          <div className="mb-4 overflow-hidden rounded-xl">
+            <img
+              src={resolveAssetPath(post.image)}
+              alt={post.title}
+              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
+        )}
         <div className="md:hover:p-6 transition-all duration-300">
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">

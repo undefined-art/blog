@@ -31,6 +31,7 @@ export const getAllPosts = (): BlogPostMeta[] => {
         date: data.date || new Date().toISOString(),
         tags: data.tags || [],
         readingTime: stats.text,
+        image: data.image,
       };
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -57,6 +58,7 @@ export const getPostBySlug = (slug: string): BlogPost | null => {
     tags: data.tags || [],
     readingTime: stats.text,
     content,
+    image: data.image,
   };
 };
 

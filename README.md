@@ -20,6 +20,7 @@ title: "Title"
 description: "A brief description"
 date: "2001-01-01"
 tags: ["Tag1", "Tag2"]
+image: "/images/cover.jpg" // Place images in the `public/images/` folder
 ---
 
 Your markdown content here...

@@ -16,7 +16,7 @@ const INITIAL_TAGS_SHOWN = 6;
 
 export const ArticlesList = ({ posts, allTags }: ArticlesListProps) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedTag, setSelectedTag] = useState<string | null>(null);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
@@ -46,9 +46,9 @@ export const ArticlesList = ({ posts, allTags }: ArticlesListProps) => {
                 post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 post.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-            const matchesTag = selectedTag === null || post.tags.includes(selectedTag);
+            const matchesTags = selectedTags.length === 0 || selectedTags.some((tag) => post.tags.includes(tag));
 
-            return matchesSearch && matchesTag;
+            return matchesSearch && matchesTags;
         });
 
         return [...filtered].sort((a, b) => {
@@ -56,7 +56,7 @@ export const ArticlesList = ({ posts, allTags }: ArticlesListProps) => {
             const dateB = new Date(b.date).getTime();
             return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
         });
-    }, [posts, searchQuery, selectedTag, sortOrder]);
+    }, [posts, searchQuery, selectedTags, sortOrder]);
 
     const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -68,13 +68,15 @@ export const ArticlesList = ({ posts, allTags }: ArticlesListProps) => {
     };
 
     const handleTagClick = (tag: string) => {
-        setSelectedTag(selectedTag === tag ? null : tag);
+        setSelectedTags((prev) =>
+            prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+        );
         setCurrentPage(1);
     };
 
     const handleClearFilters = () => {
         setSearchQuery('');
-        setSelectedTag(null);
+        setSelectedTags([]);
         setSortOrder('newest');
         setCurrentPage(1);
     };
@@ -94,7 +96,7 @@ export const ArticlesList = ({ posts, allTags }: ArticlesListProps) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const hasActiveFilters = searchQuery !== '' || selectedTag !== null;
+    const hasActiveFilters = searchQuery !== '' || !!selectedTags.length;
 
     return (
         <div className="space-y-8">
@@ -147,35 +149,38 @@ export const ArticlesList = ({ posts, allTags }: ArticlesListProps) => {
                 </div>
                 {allTags.length > 0 && (
                     <div className="space-y-3">
-                        {selectedTag && (
-                            <div className="flex items-center gap-2">
+                        {selectedTags.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-sm text-ink-500 dark:text-ink-400">Filtered by:</span>
-                                <button
-                                    onClick={() => handleTagClick(selectedTag)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full bg-accent-terracotta dark:bg-accent-ochre text-white transition-all duration-200 hover:opacity-90"
-                                    aria-label={`Remove ${selectedTag} filter`}
-                                >
-                                    {selectedTag}
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={2}
-                                        stroke="currentColor"
-                                        className="w-3.5 h-3.5"
+                                {selectedTags.map((tag) => (
+                                    <button
+                                        key={tag}
+                                        onClick={() => handleTagClick(tag)}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full bg-accent-terracotta dark:bg-accent-ochre text-white transition-all duration-200 hover:opacity-90"
+                                        aria-label={`Remove ${tag} filter`}
                                     >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
+                                        {tag}
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={2}
+                                            stroke="currentColor"
+                                            className="w-3.5 h-3.5"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                ))}
                             </div>
                         )}
                         <div className="flex flex-wrap items-center gap-2">
                             <span className="text-sm text-ink-500 dark:text-ink-400 shrink-0">
-                                {selectedTag ? 'Other tags:' : 'Filter by tag:'}
+                                {selectedTags.length > 0 ? 'Add more:' : 'Filter by tags:'}
                             </span>
                             <div className="flex flex-wrap gap-2">
                                 {visibleTags
-                                    .filter((tag) => tag !== selectedTag)
+                                    .filter((tag) => !selectedTags.includes(tag))
                                     .map((tag) => (
                                         <button
                                             key={tag}

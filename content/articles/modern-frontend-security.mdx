@@ -1,0 +1,456 @@
+---
+title: "Frontend security essentials"
+description: "XSS, CSRF, token storage, CSP, and secure headers—practical techniques to protect your users without overengineering your app."
+date: "2026-01-11"
+tags: ["Security", "Frontend", "JavaScript", "React", "Web Development"]
+---
+
+Your beautifully designed React app means nothing if someone can inject malicious scripts, steal user sessions, or trick users into performing unintended actions. **Security isn't a backend-only concern anymore.** The moment your JavaScript touches user input or handles authentication, you're on the front lines.
+
+Let's explore the modern security practices that separate production-ready applications from ticking time bombs.
+
+## 1. Cross-Site Scripting (XSS): The Ever-Present Threat
+
+XSS attacks happen when an attacker injects malicious scripts into your application, which then execute in other users' browsers. The attacker's code runs with the same privileges as your legitimate code—accessing cookies, local storage, and sensitive data.
+
+There are three flavors:
+
+- **Stored XSS:** Malicious script saved to your database (think comment sections)
+- **Reflected XSS:** Script embedded in a URL that your app renders
+- **DOM-based XSS:** Script that manipulates the DOM directly via client-side code
+
+**The Good News:** React escapes values by default when you use JSX:
+
+```tsx
+// Safe: React automatically escapes this
+const UserGreeting = ({ name }: { name: string }) => {
+  return <h1>Welcome, {name}!</h1>;
+};
+
+// Even if name is "<script>alert('hacked')</script>", 
+// it renders as harmless text
+```
+
+**The Danger Zone:** The escape hatch that bypasses protection:
+
+```tsx
+// DANGEROUS: Never use with untrusted content
+<div dangerouslySetInnerHTML={{ __html: userProvidedHTML }} />
+```
+
+If you absolutely must render HTML, sanitize it first:
+
+```tsx
+import DOMPurify from "dompurify";
+
+const SafeHTML = ({ content }: { content: string }) => {
+  const sanitized = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ["b", "i", "em", "strong", "a", "p"],
+    ALLOWED_ATTR: ["href", "target"],
+  });
+
+  return <div dangerouslySetInnerHTML={{ __html: sanitized }} />;
+};
+```
+
+**Other XSS Vectors to Watch:**
+
+- URL parameters rendered directly into the page
+- `eval()`, `new Function()`, or `innerHTML` with user data
+- Third-party scripts loaded dynamically
+- SVG files (they can contain embedded scripts)
+
+## 2. Content Security Policy (CSP): Your Security Perimeter
+
+CSP is like a bouncer for your web app. It tells the browser exactly which resources are allowed to load and execute. If an attacker somehow injects a script, CSP can prevent it from running.
+
+Configure CSP via HTTP headers or a meta tag:
+
+```tsx
+// next.config.js - Example CSP for Next.js
+const securityHeaders = [
+  {
+    key: "Content-Security-Policy",
+    value: `
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://trusted-cdn.com;
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https:;
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://api.yoursite.com;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+    `.replace(/\n/g, ""),
+  },
+];
+
+module.exports = {
+  async headers() {
+    return [{ source: "/(.*)", headers: securityHeaders }];
+  },
+};
+```
+
+**Key Directives Explained:**
+
+| Directive | Purpose | Example |
+|-----------|---------|---------|
+| `default-src` | Fallback for all resource types | `'self'` |
+| `script-src` | Where scripts can load from | `'self' https://cdn.com` |
+| `style-src` | Where styles can load from | `'self' 'unsafe-inline'` |
+| `img-src` | Where images can load from | `'self' data: https:` |
+| `connect-src` | Where fetch/XHR can connect | `'self' https://api.com` |
+| `frame-ancestors` | Who can embed your site | `'none'` (prevents clickjacking) |
+
+**The Catch:** A strict CSP breaks inline scripts and styles. You'll need to:
+- Move inline scripts to external files
+- Use nonces or hashes for necessary inline code
+- Refactor inline event handlers (`onclick`) to `addEventListener`
+
+**Start in Report-Only Mode:**
+
+```
+Content-Security-Policy-Report-Only: default-src 'self'; report-uri /csp-violations
+```
+
+This logs violations without breaking your app, helping you identify what needs fixing before enforcement.
+
+## 3. Cross-Site Request Forgery (CSRF): Invisible Actions
+
+CSRF tricks authenticated users into performing unwanted actions. The attacker creates a malicious page that submits requests to your app—and since the user is logged in, those requests include their session cookies.
+
+Imagine a user is logged into their bank. They visit a malicious site containing:
+
+```html
+<!-- Attacker's malicious page -->
+<img src="https://bank.com/transfer?to=attacker&amount=10000" />
+```
+
+The request fires automatically, with the user's cookies attached.
+
+**Modern Protections:**
+
+**1. SameSite Cookies (Your First Line of Defense):**
+
+```tsx
+// Set cookies with SameSite attribute
+res.cookie("session", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "strict", // or 'lax' for better UX
+  maxAge: 3600000,
+});
+```
+
+| SameSite Value | Behavior |
+|----------------|----------|
+| `Strict` | Cookie never sent on cross-site requests |
+| `Lax` | Cookie sent on top-level navigation only |
+| `None` | Cookie sent always (requires `Secure`) |
+
+**2. CSRF Tokens (Double-Submit Pattern):**
+
+```tsx
+// Server generates token and sets in cookie
+const csrfToken = crypto.randomUUID();
+res.cookie("csrf", csrfToken, { sameSite: "strict" });
+
+// Client includes token in request headers
+const handleSubmit = async (data: FormData) => {
+  const csrfToken = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("csrf="))
+    ?.split("=")[1];
+
+  await fetch("/api/transfer", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken ?? "",
+    },
+    body: JSON.stringify(data),
+  });
+};
+```
+
+**3. Check Origin Headers:**
+
+```tsx
+// Server-side validation
+const validateOrigin = (req: Request): boolean => {
+  const origin = req.headers.get("origin");
+  const referer = req.headers.get("referer");
+  
+  const allowedOrigins = ["https://yoursite.com"];
+  
+  return (
+    allowedOrigins.includes(origin ?? "") ||
+    allowedOrigins.some((o) => referer?.startsWith(o))
+  );
+};
+```
+
+## 4. Secure Token Storage: Where to Put JWTs
+
+The "where do I store my JWT?" question sparks heated debates. Here's the reality:
+
+**Option 1: HttpOnly Cookies (Recommended for Most Apps)**
+
+```tsx
+// Server sets the token
+res.cookie("accessToken", jwt, {
+  httpOnly: true,     // JavaScript can't access it
+  secure: true,       // HTTPS only
+  sameSite: "strict", // CSRF protection
+  maxAge: 900000,     // 15 minutes
+  path: "/",
+});
+
+// Client just makes requests—cookie sent automatically
+const fetchUserData = async () => {
+  const response = await fetch("/api/user", {
+    credentials: "include", // Important: include cookies
+  });
+  return response.json();
+};
+```
+
+**Pros:** Immune to XSS (JavaScript can't read it)  
+**Cons:** Vulnerable to CSRF (mitigate with SameSite + tokens)
+
+**Option 2: In-Memory Storage (For High-Security Apps)**
+
+```tsx
+// Token lives only in JavaScript memory
+let accessToken: string | null = null;
+
+const useAuth = () => {
+  const login = async (credentials: Credentials) => {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+    const { token } = await response.json();
+    accessToken = token; // Stored in memory only
+  };
+
+  const getToken = () => accessToken;
+  
+  return { login, getToken };
+};
+```
+
+**Pros:** Immune to CSRF, survives XSS attacks (token not in storage)  
+**Cons:** Lost on page refresh (combine with refresh token in HttpOnly cookie)
+
+**Option 3: localStorage (Use Cautiously)**
+
+```tsx
+// Only if you fully understand the XSS risk
+localStorage.setItem("token", jwt);
+
+// Anyone who achieves XSS can steal this
+const stolenToken = localStorage.getItem("token");
+```
+
+**When It's Acceptable:** Internal tools, low-risk apps, or when your CSP is bulletproof.  
+**When to Avoid:** Apps handling sensitive data, financial transactions, or PII.
+
+## 5. Input Validation: Trust Nothing
+
+Never trust data from users, URLs, or even your own API responses. Validate everything on both client and server.
+
+**Use Schema Validation:**
+
+```tsx
+import { z } from "zod";
+
+// Define your schema
+const UserInputSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z
+    .string()
+    .min(12, "Password must be at least 12 characters")
+    .regex(/[A-Z]/, "Must contain uppercase letter")
+    .regex(/[0-9]/, "Must contain number")
+    .regex(/[^A-Za-z0-9]/, "Must contain special character"),
+  age: z.number().int().min(13).max(120),
+});
+
+type UserInput = z.infer<typeof UserInputSchema>;
+
+const handleRegistration = (data: unknown) => {
+  const result = UserInputSchema.safeParse(data);
+  
+  if (!result.success) {
+    // Handle validation errors
+    const errors = result.error.flatten();
+    return { success: false, errors };
+  }
+  
+  // Safe to use result.data
+  return submitToServer(result.data);
+};
+```
+
+**Sanitize URL Parameters:**
+
+```tsx
+// Dangerous: Direct use of URL params
+const searchQuery = new URLSearchParams(window.location.search).get("q");
+document.getElementById("results")!.innerHTML = `Results for: ${searchQuery}`;
+
+// Safe: Escape or validate first
+const escapeHTML = (str: string): string => {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+};
+
+const safeQuery = escapeHTML(searchQuery ?? "");
+```
+
+## 6. Subresource Integrity (SRI): Trust but Verify
+
+When loading scripts from CDNs, how do you know the file hasn't been tampered with? SRI lets you specify a cryptographic hash that the browser verifies before executing.
+
+```html
+<script
+  src="https://cdn.example.com/library@2.0.0/dist/index.min.js"
+  integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxkPTBEOy7f5OJB5VhjhNYHH5D"
+  crossorigin="anonymous"
+></script>
+
+<link
+  rel="stylesheet"
+  href="https://cdn.example.com/styles.css"
+  integrity="sha384-Li9vy3DqF8tnTXuiaAJuML3ky+er10rcgNR/VqsVpcw+ThHmYcwiB1pbOxEbzJr7"
+  crossorigin="anonymous"
+/>
+```
+
+If the CDN is compromised and serves a different file, the hash won't match and the browser blocks it.
+
+**Generate Hashes:**
+
+```bash
+# Generate SRI hash for a file
+cat library.min.js | openssl dgst -sha384 -binary | openssl base64 -A
+```
+
+Or use the [SRI Hash Generator](https://www.srihash.org/) for convenience.
+
+## 7. Dependency Security: Your Weakest Link
+
+Your `node_modules` folder contains thousands of packages, each a potential vulnerability. A single compromised dependency can expose your entire user base.
+
+**Regular Audits:**
+
+```bash
+# Check for known vulnerabilities
+npm audit
+
+# Auto-fix what's possible
+npm audit fix
+
+# For aggressive fixing (may break things)
+npm audit fix --force
+```
+
+**Lock Your Dependencies:**
+
+```json
+// package.json - Avoid floating versions
+{
+  "dependencies": {
+    "react": "18.2.0",        // Exact version
+    "lodash": "^4.17.21",     // Caret: allows patches
+    "axios": "~1.6.0"         // Tilde: very conservative
+  }
+}
+```
+
+**Use Automated Scanning:**
+
+- **GitHub Dependabot:** Automatic PRs for vulnerable dependencies
+- **Snyk:** Deep analysis with fix recommendations
+- **Socket.dev:** Detects supply chain attacks
+
+**Evaluate Before Installing:**
+
+```bash
+# Check package health before adding
+npx npm-check-updates --filter <package>
+```
+
+Ask yourself:
+- How many weekly downloads?
+- When was it last updated?
+- How many open issues/PRs?
+- Who maintains it?
+
+## 8. Secure Communication: HTTPS Everywhere
+
+HTTPS isn't optional—it's the baseline. But proper implementation goes beyond just having a certificate.
+
+**Force HTTPS with HSTS:**
+
+```tsx
+// Security headers configuration
+const headers = [
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=31536000; includeSubDomains; preload",
+  },
+];
+```
+
+This tells browsers to **always** use HTTPS, even if a user types `http://`. The `preload` directive submits your site to browser preload lists for ultimate protection.
+
+**Additional Security Headers:**
+
+```tsx
+const securityHeaders = [
+  // Prevent MIME type sniffing
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  
+  // Control iframe embedding (clickjacking protection)
+  { key: "X-Frame-Options", value: "DENY" },
+  
+  // Disable browser features you don't use
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=()",
+  },
+  
+  // Control referrer information leakage
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+];
+```
+
+## Quick Security Checklist
+
+| Threat | Protection | Priority |
+|--------|------------|----------|
+| **XSS** | Escape output, CSP, sanitize HTML | Critical |
+| **CSRF** | SameSite cookies, CSRF tokens | Critical |
+| **Token Theft** | HttpOnly cookies, secure storage | Critical |
+| **Clickjacking** | `frame-ancestors 'none'`, X-Frame-Options | High |
+| **Man-in-the-Middle** | HTTPS, HSTS | Critical |
+| **Supply Chain** | Dependency audits, SRI, lock files | High |
+| **Data Exposure** | Input validation, output encoding | High |
+
+## The Takeaway
+
+Frontend security isn't about implementing every technique you've ever heard of. It's about understanding your specific threat model and applying the right protections:
+
+- **Handling user-generated content?** XSS is your primary concern. Sanitize religiously.
+- **Session-based auth?** Focus on CSRF protection with SameSite cookies.
+- **Token-based auth?** HttpOnly cookies beat localStorage for most apps.
+- **Using CDNs?** Implement SRI for integrity verification.
+- **Any app in production?** HTTPS, security headers, and dependency auditing are non-negotiable.
+
+Security is a layered defense. No single technique is bulletproof, but combined, they make your application a significantly harder target. The goal isn't perfection—it's making attackers move on to easier prey.
+
+Start with the basics. Audit what you have. Improve incrementally. Your users are trusting you with their data—earn that trust.

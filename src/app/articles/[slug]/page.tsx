@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getAllPosts, getPostBySlug, formatDate } from '@/lib/blog';
+import { resolveAssetPath } from '@/lib/utils';
 import { MDXContent } from '@/components/MDXContent';
 
 type PageProps = {
@@ -34,6 +35,7 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
       type: 'article',
       publishedTime: post.date,
       tags: post.tags,
+      ...(post.image && { images: [{ url: resolveAssetPath(post.image) }] }),
     },
   };
 };
@@ -97,6 +99,15 @@ const ArticlePage = async ({ params }: PageProps) => {
             <span className="w-1 h-1 rounded-full bg-current" aria-hidden="true" />
             <span>{post.readingTime}</span>
           </div>
+          {post.image && (
+            <div className="mt-8 overflow-hidden rounded-xl">
+              <img
+                src={resolveAssetPath(post.image)}
+                alt={post.title}
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          )}
           <div className="mt-8 flex items-center gap-4" aria-hidden="true">
             <div className="h-px flex-1 bg-gradient-to-r from-accent-terracotta/50 to-transparent dark:from-accent-ochre/50" />
             <span className="text-accent-terracotta dark:text-accent-ochre">✦</span>

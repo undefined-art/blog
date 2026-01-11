@@ -6,6 +6,7 @@ export type BlogPost = {
   tags: string[];
   readingTime: string;
   content: string;
+  image?: string;
 };
 
 export type BlogPostMeta = Omit<BlogPost, 'content'>;

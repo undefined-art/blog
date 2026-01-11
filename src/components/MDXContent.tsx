@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { resolveAssetPath } from '@/lib/utils';
 
 type MDXContentProps = {
   content: string;
@@ -120,8 +121,8 @@ export const MDXContent = ({ content }: MDXContentProps) => {
     const tables: string[] = [];
     const numberedLists: string[] = [];
     const bulletLists: string[] = [];
+    const images: string[] = [];
 
-    // Store code blocks first
     html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
       const index = codeBlocks.length;
       const langClass = lang ? `language-${lang}` : '';
@@ -129,6 +130,26 @@ export const MDXContent = ({ content }: MDXContentProps) => {
         `<pre class="bg-ink-900 border border-ink-700/50 rounded-xl p-4 overflow-x-auto my-6"><code class="${langClass} text-parchment-200 text-sm font-mono">${escapeHtml(code.trim())}</code></pre>`
       );
       return `__CODE_BLOCK_${index}__`;
+    });
+
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => {
+      const index = images.length;
+      const altText = escapeHtml(alt || 'Article image');
+      const resolvedSrc = resolveAssetPath(src);
+
+      images.push(
+        `<figure class="my-8">
+          <img 
+            src="${resolvedSrc}" 
+            alt="${altText}" 
+            class="w-full rounded-xl border border-ink-200 dark:border-ink-700 shadow-sm"
+            loading="lazy"
+          />
+          ${alt ? `<figcaption class="mt-3 text-center text-sm text-ink-500 dark:text-ink-400 italic">${altText}</figcaption>` : ''}
+        </figure>`
+      );
+
+      return `__IMAGE_${index}__`;
     });
 
     html = html.replace(
@@ -204,6 +225,7 @@ export const MDXContent = ({ content }: MDXContentProps) => {
         if (trimmed.startsWith('__TABLE_')) return trimmed;
         if (trimmed.startsWith('__NUMLIST_')) return trimmed;
         if (trimmed.startsWith('__BULLETLIST_')) return trimmed;
+        if (trimmed.startsWith('__IMAGE_')) return trimmed;
         return `<p class="my-4 text-ink-700 dark:text-parchment-300 leading-relaxed">${trimmed.replace(/\n/g, '<br />')}</p>`;
       })
       .join('\n');
@@ -224,13 +246,17 @@ export const MDXContent = ({ content }: MDXContentProps) => {
       html = html.replace(`__BULLETLIST_${index}__`, list);
     });
 
+    images.forEach((image, index) => {
+      html = html.replace(`__IMAGE_${index}__`, image);
+    });
+
     html = html.replace(
-      /<p class="[^"]*">(<(h[1-6]|ul|ol|blockquote|pre|hr|div)[^>]*>)/g,
+      /<p class="[^"]*">(<(h[1-6]|ul|ol|blockquote|pre|hr|div|figure)[^>]*>)/g,
       '$1'
     );
 
     html = html.replace(
-      /(<\/(h[1-6]|ul|ol|blockquote|pre|div)>)<\/p>/g,
+      /(<\/(h[1-6]|ul|ol|blockquote|pre|div|figure)>)<\/p>/g,
       '$1'
     );
 

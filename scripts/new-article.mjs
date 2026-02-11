@@ -86,13 +86,13 @@ const createArticle = (title, description = '', tags = []) => {
 
 const parseArgs = () => {
   const args = process.argv.slice(2);
-  
+
   if (args.length === 0) {
     return null;
   }
 
   const parsed = { title: '', description: '', tags: [] };
-  
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '-t' || arg === '--title') {
@@ -100,7 +100,10 @@ const parseArgs = () => {
     } else if (arg === '-d' || arg === '--description') {
       parsed.description = args[++i] || '';
     } else if (arg === '--tags') {
-      parsed.tags = (args[++i] || '').split(',').map(t => t.trim()).filter(Boolean);
+      parsed.tags = (args[++i] || '')
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
     } else if (arg === '-h' || arg === '--help') {
       console.log(`
 ✦ New Article Script

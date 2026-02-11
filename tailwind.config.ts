@@ -88,7 +88,7 @@ const config: Config = {
         'fade-in': 'fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-up': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'scale-in': 'scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'float': 'float 6s ease-in-out infinite',
+        float: 'float 6s ease-in-out infinite',
         'stagger-1': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards',
         'stagger-2': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards',
         'stagger-3': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards',
@@ -120,4 +120,3 @@ const config: Config = {
 };
 
 export default config;
-

@@ -152,14 +152,11 @@ export const MDXContent = ({ content }: MDXContentProps) => {
       return `__IMAGE_${index}__`;
     });
 
-    html = html.replace(
-      /(\|.+\|\n\|[\s\-:|]+\|\n(?:\|.+\|\n?)+)/g,
-      (match) => {
-        const index = tables.length;
-        tables.push(parseTable(match));
-        return `__TABLE_${index}__`;
-      }
-    );
+    html = html.replace(/(\|.+\|\n\|[\s\-:|]+\|\n(?:\|.+\|\n?)+)/g, (match) => {
+      const index = tables.length;
+      tables.push(parseTable(match));
+      return `__TABLE_${index}__`;
+    });
 
     html = html.replace(/(?:^|\n)((?:\d+\.\s+.+\n?)+)/g, (match, listContent) => {
       const index = numberedLists.length;
@@ -209,10 +206,7 @@ export const MDXContent = ({ content }: MDXContentProps) => {
       '<blockquote class="border-l-4 border-accent-terracotta dark:border-accent-ochre bg-parchment-100/50 dark:bg-ink-900/50 py-3 px-4 my-6 rounded-r-lg"><p class="italic text-ink-600 dark:text-parchment-400">$1</p></blockquote>'
     );
 
-    html = html.replace(
-      /^---$/gm,
-      '<hr class="my-8 border-ink-200 dark:border-ink-700" />'
-    );
+    html = html.replace(/^---$/gm, '<hr class="my-8 border-ink-200 dark:border-ink-700" />');
 
     const blocks = html.split(/\n\n+/);
 
@@ -255,18 +249,10 @@ export const MDXContent = ({ content }: MDXContentProps) => {
       '$1'
     );
 
-    html = html.replace(
-      /(<\/(h[1-6]|ul|ol|blockquote|pre|div|figure)>)<\/p>/g,
-      '$1'
-    );
+    html = html.replace(/(<\/(h[1-6]|ul|ol|blockquote|pre|div|figure)>)<\/p>/g, '$1');
 
     return html;
   }, [content]);
 
-  return (
-    <div
-      className="prose-content"
-      dangerouslySetInnerHTML={{ __html: htmlContent }}
-    />
-  );
+  return <div className="prose-content" dangerouslySetInnerHTML={{ __html: htmlContent }} />;
 };

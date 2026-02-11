@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 
 export const GET = () => {
   const feed = generateRssFeed();
-  
+
   return new Response(feed, {
     headers: {
       'Content-Type': 'application/xml',
@@ -12,4 +12,3 @@ export const GET = () => {
     },
   });
 };
-

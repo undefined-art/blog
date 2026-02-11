@@ -1,12 +1,23 @@
 'use client';
 
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'motion/react';
 import { useTheme } from './ThemeProvider';
 import { useState } from 'react';
 
+const navItemVariants = {
+  hidden: { opacity: 0, y: -8 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.3, ease: [0.16, 1, 0.3, 1] as const },
+  }),
+};
+
+const menuTransition = { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const };
+
 export const Header = () => {
   const { theme, toggleTheme, mounted } = useTheme();
-
   const [isOpen, setIsOpen] = useState(false);
 
   const handleThemeToggle = () => {
@@ -28,88 +39,148 @@ export const Header = () => {
     <header className="sticky top-0 z-50 backdrop-blur-md bg-parchment-50/80 dark:bg-ink-950/80 border-b border-ink-100 dark:border-ink-800">
       <nav className="max-w-4xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-display text-2xl font-semibold text-ink-900 dark:text-parchment-100 hover:text-accent-terracotta dark:hover:text-accent-ochre transition-colors duration-200"
-            aria-label="Go to homepage"
+          <motion.div
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}
           >
-            ✦ Tech grove
-          </Link>
+            <Link
+              href="/"
+              className="font-display text-2xl font-semibold text-ink-900 dark:text-parchment-100 hover:text-accent-terracotta dark:hover:text-accent-ochre transition-colors duration-200"
+              aria-label="Go to homepage"
+            >
+              ✦ Tech grove
+            </Link>
+          </motion.div>
           <div className="flex items-center gap-2 md:gap-8">
             <div className="hidden md:flex items-center gap-8">
-              <Link
-                href="/articles/"
-                className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
-              >
-                Articles
-              </Link>
-              <Link
-                href="/about/"
-                className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
-              >
-                About
-              </Link>
+              <motion.div custom={0} variants={navItemVariants} initial="hidden" animate="visible">
+                <Link
+                  href="/articles/"
+                  className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
+                >
+                  Articles
+                </Link>
+              </motion.div>
+              <motion.div custom={1} variants={navItemVariants} initial="hidden" animate="visible">
+                <Link
+                  href="/about/"
+                  className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
+                >
+                  About
+                </Link>
+              </motion.div>
             </div>
-            <button
-              onClick={handleThemeToggle}
-              onKeyDown={handleKeyDown}
-              className="p-2 rounded-full bg-parchment-100 dark:bg-ink-800 hover:bg-parchment-200 dark:hover:bg-ink-700 transition-colors duration-200"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              tabIndex={0}
+            <motion.div
+              custom={2}
+              variants={navItemVariants}
+              initial="hidden"
+              animate="visible"
+              whileTap={{ scale: 0.92 }}
             >
-              {!mounted ? (
-                <div className="w-5 h-5" aria-hidden="true" />
-              ) : theme === 'light' ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5 text-ink-700"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5 text-parchment-300"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                  />
-                </svg>
-              )}
-            </button>
-            <button
-              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-md
-         hover:bg-accent-terracotta/10 dark:hover:bg-accent-ochre/10 transition focus:outline-none" onClick={handleMenuToggle}>
-              <span className="block w-6 h-0.5 dark:bg-white bg-ink-900 transition-all duration-300 origin-center"></span>
-              <span className="block w-6 h-0.5 dark:bg-white bg-ink-900 my-1.5 transition-all duration-300"></span>
-              <span className="block w-6 h-0.5 dark:bg-white bg-ink-900 transition-all duration-300 origin-center"></span>
-            </button>
+              <button
+                onClick={handleThemeToggle}
+                onKeyDown={handleKeyDown}
+                className="p-2 rounded-full bg-parchment-100 dark:bg-ink-800 hover:bg-parchment-200 dark:hover:bg-ink-700 transition-colors duration-200"
+                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                tabIndex={0}
+              >
+                {!mounted ? (
+                  <div className="w-5 h-5" aria-hidden="true" />
+                ) : theme === 'light' ? (
+                  <motion.svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5 text-ink-700"
+                    aria-hidden="true"
+                    initial={false}
+                    animate={{ rotate: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+                    />
+                  </motion.svg>
+                ) : (
+                  <motion.svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5 text-parchment-300"
+                    aria-hidden="true"
+                    initial={false}
+                    animate={{ rotate: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                    />
+                  </motion.svg>
+                )}
+              </button>
+            </motion.div>
+            <motion.button
+              className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-md hover:bg-accent-terracotta/10 dark:hover:bg-accent-ochre/10 transition focus:outline-none focus:ring-2 focus:ring-accent-terracotta/50 dark:focus:ring-accent-ochre/50"
+              onClick={handleMenuToggle}
+              aria-expanded={isOpen}
+              aria-label="Toggle menu"
+              whileTap={{ scale: 0.96 }}
+            >
+              <motion.span
+                className="block w-6 h-0.5 dark:bg-white bg-ink-900 origin-center"
+                animate={isOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.2 }}
+              />
+              <motion.span
+                className="block w-6 h-0.5 dark:bg-white bg-ink-900 my-1.5"
+                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              />
+              <motion.span
+                className="block w-6 h-0.5 dark:bg-white bg-ink-900 origin-center"
+                animate={isOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+                transition={{ duration: 0.2 }}
+              />
+            </motion.button>
           </div>
         </div>
-        {isOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-parchment-50 dark:bg-ink-950 border-b border-ink-100 dark:border-ink-800">
-            <nav className="flex flex-col gap-4 p-4">
-              <Link href="/articles/" className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200">Articles</Link>
-              <Link href="/about/" className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200">About</Link>
-            </nav>
-          </div>
-        )}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              className="md:hidden absolute top-full left-0 w-full bg-parchment-50 dark:bg-ink-950 border-b border-ink-100 dark:border-ink-800 overflow-hidden"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={menuTransition}
+            >
+              <nav className="flex flex-col gap-4 p-4">
+                <Link
+                  href="/articles/"
+                  className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Articles
+                </Link>
+                <Link
+                  href="/about/"
+                  className="link-underline text-ink-600 dark:text-parchment-300 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
+                  About
+                </Link>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </header>
   );

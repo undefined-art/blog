@@ -3,6 +3,7 @@ import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AuroraBackground } from '@/components/backgrounds/AuroraBackground';
 
 export const metadata: Metadata = {
   title: {
@@ -39,6 +40,7 @@ const RootLayout = ({ children }: RootLayoutProps) => {
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
+          <AuroraBackground />
           <div className="fixed inset-0 pointer-events-none grain-overlay" aria-hidden="true" />
           <Header />
           <main className="flex-1 relative">{children}</main>

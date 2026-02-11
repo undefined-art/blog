@@ -12,7 +12,7 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'dark',
-  toggleTheme: () => { },
+  toggleTheme: () => {},
   mounted: false,
 });
 

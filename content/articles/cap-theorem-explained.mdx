@@ -1,8 +1,8 @@
 ---
-title: "CAP Theorem: The Trade-off Every Developer Should Understand"
+title: 'CAP Theorem: The Trade-off Every Developer Should Understand'
 description: "A practical guide to the CAP theorem and why you can't have it all in distributed systems. Learn when to pick consistency over availability, and vice versa."
-date: "2024-12-30"
-tags: ["System Design", "Distributed Systems", "Architecture"]
+date: '2024-12-30'
+tags: ['System Design', 'Distributed Systems', 'Architecture']
 ---
 
 Let me tell you about a lesson I learned the hard way: you can't have everything in distributed systems. This isn't pessimism—it's physics. And it has a name: the CAP theorem.
@@ -15,7 +15,7 @@ Back in 2000, Eric Brewer proposed something that changed how we think about dis
 - **A**vailability — Every request gets a response (success or failure)
 - **P**artition Tolerance — The system keeps working despite network failures
 
-Here's the kicker: network partitions *will* happen. Cables get cut. Data centers go dark. Packets get lost in the void. So in practice, you're really choosing between **consistency** and **availability** when things go wrong.
+Here's the kicker: network partitions _will_ happen. Cables get cut. Data centers go dark. Packets get lost in the void. So in practice, you're really choosing between **consistency** and **availability** when things go wrong.
 
 ## The Real-World Trade-off
 
@@ -24,11 +24,13 @@ Think of it like this. You're running an online store with servers in New York a
 A network hiccup cuts communication between them. A customer in London tries to buy the last item in stock. What do you do?
 
 **Option 1: Choose Consistency (CP)**
+
 > Sorry, we can't process your order right now. Try again later.
 
 The London server refuses to act because it can't confirm with New York. Frustrating for the user, but you won't accidentally oversell.
 
 **Option 2: Choose Availability (AP)**
+
 > Order confirmed!
 
 Both servers accept orders independently. Great user experience—until you realize you sold the same item twice.
@@ -40,11 +42,13 @@ Neither is wrong. It depends on what matters more for your use case.
 Here's a quick mental framework I use:
 
 **Pick Consistency (CP) when:**
+
 - Money is involved (banking, payments)
 - Inventory matters (limited stock, reservations)
 - Data accuracy is critical (medical records, legal documents)
 
 **Pick Availability (AP) when:**
+
 - User experience trumps perfect accuracy
 - Data can be reconciled later (social media likes, analytics)
 - Stale data is acceptable temporarily (cached content, recommendations)
@@ -53,13 +57,13 @@ Here's a quick mental framework I use:
 
 Let's look at how popular systems made their choice:
 
-| System | Choice | Why |
-|--------|--------|-----|
-| **MongoDB** | CP | Consistency for document integrity |
-| **Cassandra** | AP | Always available, eventually consistent |
-| **Redis Cluster** | CP | Strong consistency for caching |
-| **DynamoDB** | AP (tunable) | High availability with eventual consistency |
-| **Zookeeper** | CP | Coordination requires consistency |
+| System            | Choice       | Why                                         |
+| ----------------- | ------------ | ------------------------------------------- |
+| **MongoDB**       | CP           | Consistency for document integrity          |
+| **Cassandra**     | AP           | Always available, eventually consistent     |
+| **Redis Cluster** | CP           | Strong consistency for caching              |
+| **DynamoDB**      | AP (tunable) | High availability with eventual consistency |
+| **Zookeeper**     | CP           | Coordination requires consistency           |
 
 ## The Dirty Secret: It's Not Binary
 
@@ -88,5 +92,3 @@ After building systems that handled both approaches, here's what I've learned:
 CAP theorem isn't about limitations—it's about clarity. Once you accept that you can't have everything, you start making intentional trade-offs instead of accidental ones.
 
 Next time you're designing a system, ask yourself: "When the network fails, what matters more—being correct or being available?"
-
-

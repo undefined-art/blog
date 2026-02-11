@@ -1,0 +1,20 @@
+# Dependencies and build
+node_modules
+.next
+out
+build
+dist
+
+# Lock files and generated
+package-lock.json
+*.tsbuildinfo
+next-env.d.ts
+
+# Content that should not be reformatted
+*.min.js
+*.min.css
+public
+
+# Misc
+.vercel
+coverage

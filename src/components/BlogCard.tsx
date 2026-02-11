@@ -1,28 +1,61 @@
+'use client';
+
 import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'motion/react';
 import { formatDate, resolveAssetPath } from '@/lib/utils';
 import type { BlogPostMeta } from '@/lib/types';
 
 type BlogCardProps = {
   post: BlogPostMeta;
+  index?: number;
 };
 
-export const BlogCard = ({ post }: BlogCardProps) => {
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.06,
+      duration: 0.4,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
+  }),
+};
+
+export const BlogCard = ({ post, index = 0 }: BlogCardProps) => {
   return (
-    <article className="card-hover group">
+    <motion.article
+      className="group"
+      custom={index}
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.99 }}
+      transition={{ duration: 0.2 }}
+    >
       <Link
         href={`/articles/${post.slug}/`}
-        className="animate-stagger-3 block rounded-2xl md:hover:bg-parchment-100/50 dark:md:hover:bg-ink-900/50 transition-colors duration-300"
+        className="block rounded-2xl md:hover:bg-parchment-100/50 dark:md:hover:bg-ink-900/50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-accent-terracotta/50 dark:focus:ring-accent-ochre/50 focus:ring-offset-2 dark:focus:ring-offset-ink-950"
         aria-label={`Read article: ${post.title}`}
       >
         {post.image && (
-          <div className="mb-4 overflow-hidden rounded-xl">
-            <img
+          <motion.div
+            className="mb-4 relative h-48 w-full overflow-hidden rounded-xl"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Image
               src={resolveAssetPath(post.image)}
               alt={post.title}
-              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              className="object-cover"
+              sizes="(max-width: 896px) 100vw, 896px"
               loading="lazy"
             />
-          </div>
+          </motion.div>
         )}
         <div className="md:hover:p-6 transition-all duration-300">
           {post.tags.length > 0 && (
@@ -50,24 +83,26 @@ export const BlogCard = ({ post }: BlogCardProps) => {
           </div>
           <div className="mt-4 flex items-center gap-2 text-accent-terracotta dark:text-accent-ochre font-medium text-sm md:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <span>Read article</span>
-            <svg
+            <motion.svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+              className="w-4 h-4 inline-block"
               aria-hidden="true"
+              whileHover={{ x: 4 }}
+              transition={{ duration: 0.2 }}
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
               />
-            </svg>
+            </motion.svg>
           </div>
         </div>
       </Link>
-    </article>
+    </motion.article>
   );
 };

@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { motion } from 'motion/react';
 
 const techBadges = [
   { name: 'Next.js', color: 'from-neutral-500/20 to-neutral-600/20 border-neutral-500/30' },
@@ -9,66 +12,114 @@ const techBadges = [
   { name: 'Playwright', color: 'from-teal-500/20 to-teal-600/20 border-teal-500/30' },
 ];
 
-const staggerClasses = [
-  'animate-stagger-1',
-  'animate-stagger-2',
-  'animate-stagger-3',
-  'animate-stagger-4',
-  'animate-stagger-5',
-  'animate-stagger-6',
-];
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
+  },
+};
 
 const HomePage = () => {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-12 flex flex-col items-center justify-center min-h-[70vh]">
-      <div className="text-center">
-        <div className="mb-2 animate-scale-in">
-          <span className="text-6xl md:text-8xl animate-bounce transition-all duration-300 inline-block">✦</span>
-        </div>
-        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-ink-900 dark:text-parchment-100 leading-tight animate-fade-in">
+      <motion.div
+        className="text-center"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.h1
+          className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-ink-900 dark:text-parchment-100 leading-tight"
+          variants={itemVariants}
+        >
           undefined-art
-        </h1>
-        <p className="mt-6 text-xl md:text-2xl text-ink-600 dark:text-parchment-400 max-w-xl mx-auto animate-stagger-1">
+        </motion.h1>
+        <motion.p
+          className="mt-6 text-xl md:text-2xl text-ink-600 dark:text-parchment-400 max-w-xl mx-auto"
+          variants={itemVariants}
+        >
           Front-End Engineer. Code enthusiast. <br className="hidden md:block" />
           Building beautiful web experiences.
-        </p>
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-stagger-2">
-          <Link
-            href="/articles/"
-            className="px-8 py-3 bg-accent-terracotta dark:bg-accent-ochre text-white rounded-full font-medium hover:opacity-90 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-terracotta/25 dark:hover:shadow-accent-ochre/25"
-          >
-            Read Articles
-          </Link>
-          <a
+        </motion.p>
+        <motion.div
+          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          variants={itemVariants}
+        >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Link
+              href="/articles/"
+              className="inline-block px-8 py-3 bg-accent-terracotta dark:bg-accent-ochre text-white rounded-full font-medium focus:outline-none focus:ring-2 focus:ring-accent-terracotta/50 dark:focus:ring-accent-ochre/50 focus:ring-offset-2 dark:focus:ring-offset-ink-950"
+              aria-label="Read articles"
+            >
+              Read Articles
+            </Link>
+          </motion.div>
+          <motion.a
             href="https://github.com/undefined-art"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-3 border border-ink-300 dark:border-ink-600 text-ink-700 dark:text-parchment-300 rounded-full font-medium hover:bg-parchment-100 dark:hover:bg-ink-800 transition-all duration-200"
+            className="inline-block px-8 py-3 border border-ink-300 dark:border-ink-600 text-ink-700 dark:text-parchment-300 rounded-full font-medium hover:bg-parchment-100 dark:hover:bg-ink-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ink-400 dark:focus:ring-ink-500 focus:ring-offset-2"
+            aria-label="View GitHub profile"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
             View GitHub
-          </a>
-        </div>
-      </div>
+          </motion.a>
+        </motion.div>
+      </motion.div>
 
-      <div className="mt-20 w-full flex items-center gap-4 animate-stagger-3" aria-hidden="true">
+      <motion.div
+        className="mt-20 w-full flex items-center gap-4"
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.4 }}
+      >
         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-accent-terracotta/30 to-transparent dark:via-accent-ochre/30" />
-      </div>
+      </motion.div>
 
-      <div className="mt-12 text-center animate-stagger-4">
+      <motion.div
+        className="mt-12 text-center"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7, duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
+      >
         <p className="text-sm text-ink-400 dark:text-ink-500 uppercase tracking-wider mb-6">
           Tech Stack
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {techBadges.map((tech, index) => (
-            <span
+        <motion.div
+          className="flex flex-wrap items-center justify-center gap-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {techBadges.map((tech) => (
+            <motion.span
               key={tech.name}
-              className={`px-4 py-2 rounded-xl bg-gradient-to-br ${tech.color} border text-ink-700 dark:text-parchment-200 text-sm font-medium backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:-translate-y-0.5 ${staggerClasses[index] ?? 'animate-stagger-6'}`}
+              variants={itemVariants}
+              className={`px-4 py-2 rounded-xl bg-gradient-to-br ${tech.color} border text-ink-700 dark:text-parchment-200 text-sm font-medium backdrop-blur-sm`}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
             >
               {tech.name}
-            </span>
+            </motion.span>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

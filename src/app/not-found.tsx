@@ -16,8 +16,8 @@ const NotFound = () => {
           Page Not Found
         </h1>
         <p className="mt-4 text-lg text-ink-600 dark:text-parchment-400 max-w-md mx-auto">
-          Oops! The page you're looking for seems to have wandered off. 
-          Let's get you back on track.
+          Oops! The page you&apos;re looking for seems to have wandered off. Let&apos;s get you back
+          on track.
         </p>
         <Link
           href="/"
@@ -46,4 +46,3 @@ const NotFound = () => {
 };
 
 export default NotFound;
-

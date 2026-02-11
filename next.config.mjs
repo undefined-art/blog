@@ -5,7 +5,7 @@ import rehypeHighlight from 'rehype-highlight';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: "/blog",
+  basePath: '/blog',
   output: 'export',
   images: {
     unoptimized: true,

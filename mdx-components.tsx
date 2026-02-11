@@ -18,9 +18,7 @@ export const useMDXComponents = (components: MDXComponents): MDXComponents => {
       </h3>
     ),
     p: ({ children }) => (
-      <p className="my-4 text-ink-700 dark:text-parchment-300 leading-relaxed">
-        {children}
-      </p>
+      <p className="my-4 text-ink-700 dark:text-parchment-300 leading-relaxed">{children}</p>
     ),
     a: ({ href, children }) => (
       <a
@@ -63,21 +61,12 @@ export const useMDXComponents = (components: MDXComponents): MDXComponents => {
         {children}
       </ol>
     ),
-    li: ({ children }) => (
-      <li className="pl-2">{children}</li>
-    ),
-    hr: () => (
-      <hr className="my-8 border-ink-200 dark:border-ink-700" />
-    ),
+    li: ({ children }) => <li className="pl-2">{children}</li>,
+    hr: () => <hr className="my-8 border-ink-200 dark:border-ink-700" />,
     strong: ({ children }) => (
-      <strong className="font-semibold text-ink-900 dark:text-parchment-100">
-        {children}
-      </strong>
+      <strong className="font-semibold text-ink-900 dark:text-parchment-100">{children}</strong>
     ),
-    em: ({ children }) => (
-      <em className="italic">{children}</em>
-    ),
+    em: ({ children }) => <em className="italic">{children}</em>,
     ...components,
   };
 };
-

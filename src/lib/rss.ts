@@ -6,12 +6,12 @@ const SITE_DESCRIPTION = 'Thoughts, code, and creative experiments by undefined-
 
 export const generateRssFeed = (): string => {
   const posts = getAllPosts();
-  
+
   const itemsXml = posts
     .map((post) => {
       const postUrl = `${SITE_URL}/articles/${post.slug}/`;
       const pubDate = new Date(post.date).toUTCString();
-      
+
       return `
     <item>
       <title><![CDATA[${post.title}]]></title>
@@ -39,4 +39,3 @@ export const generateRssFeed = (): string => {
 
   return rss;
 };
-

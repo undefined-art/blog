@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SectionReveal } from '@/components/SectionReveal';
 
 export const metadata: Metadata = {
   title: 'About',
@@ -14,7 +15,16 @@ const techStack = {
   backend: {
     title: 'Backend',
     icon: '⚙️',
-    skills: ['Node.js', 'Golang', 'Nest.js', 'PostgreSQL', 'MongoDB', 'REST APIs', 'RabbitMQ', 'Microservices'],
+    skills: [
+      'Node.js',
+      'Golang',
+      'Nest.js',
+      'PostgreSQL',
+      'MongoDB',
+      'REST APIs',
+      'RabbitMQ',
+      'Microservices',
+    ],
   },
   devops: {
     title: 'DevOps',
@@ -24,32 +34,47 @@ const techStack = {
   tools: {
     title: 'Tools',
     icon: '🛠️',
-    skills: ['Git', 'Cursor', 'Figma', 'Postman', 'Jira', 'Playwright', 'Cypress', 'Jest', 'Turborepo', 'Web Vitals', 'Redis'],
+    skills: [
+      'Git',
+      'Cursor',
+      'Figma',
+      'Postman',
+      'Jira',
+      'Playwright',
+      'Cypress',
+      'Jest',
+      'Turborepo',
+      'Web Vitals',
+      'Redis',
+    ],
   },
 };
 
 const AboutPage = () => {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-24">
-      <div>
-        <h1 className="font-display text-4xl md:text-5xl font-bold text-ink-900 dark:text-parchment-100 mb-4 animate-fade-in">
-          About Me
-        </h1>
-        <p className="text-lg text-ink-500 dark:text-ink-400 animate-stagger-1">
-          @undefined-art · Monulph
-        </p>
-      </div>
-      <div className="animate-stagger-2 mt-8">
+      <SectionReveal>
+        <div>
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-ink-900 dark:text-parchment-100 mb-4">
+            About Me
+          </h1>
+          <p className="text-lg text-ink-500 dark:text-ink-400">@undefined-art · Monulph</p>
+        </div>
+      </SectionReveal>
+      <SectionReveal className="mt-8" delay={0.1}>
         <p className="text-xl text-ink-600 dark:text-parchment-400 leading-relaxed">
-          Front-End Engineer with <span className="text-accent-terracotta dark:text-accent-ochre font-semibold">5+ years</span> of
-          experience building modern web applications. I'm passionate about clean code,
+          Front-End Engineer with{' '}
+          <span className="text-accent-terracotta dark:text-accent-ochre font-semibold">
+            5+ years
+          </span>{' '}
+          of experience building modern web applications. I&apos;m passionate about clean code,
           great user experiences, and the intersection of design and development.
         </p>
         <p className="mt-4 text-lg text-ink-500 dark:text-parchment-500 italic">
-          "Code is poetry, bugs are features, and coffee is life ☕"
+          &quot;Code is poetry, bugs are features, and coffee is life ☕&quot;
         </p>
-      </div>
-      <div className="animate-stagger-3 mt-16">
+      </SectionReveal>
+      <SectionReveal className="mt-16" delay={0.15}>
         <h2 className="font-display text-2xl font-semibold text-ink-900 dark:text-parchment-100 mb-8">
           Tech Stack
         </h2>
@@ -81,8 +106,8 @@ const AboutPage = () => {
             </div>
           ))}
         </div>
-      </div>
-      <div className="animate-stagger-4 mt-12">
+      </SectionReveal>
+      <SectionReveal className="mt-12" delay={0.2}>
         <div className="rounded-2xl bg-gradient-to-r from-ink-900 to-ink-800 dark:from-ink-950 dark:to-ink-900 p-6 text-parchment-100 font-mono text-sm overflow-hidden">
           <div className="flex items-center gap-2 mb-4 text-accent-sage">
             <span className="inline-block w-3 h-3 rounded-full bg-red-500" />
@@ -91,19 +116,30 @@ const AboutPage = () => {
             <span className="ml-2 text-ink-400">terminal</span>
           </div>
           <div className="space-y-2">
-            <p><span className="text-accent-ochre">$</span> whoami</p>
+            <p>
+              <span className="text-accent-ochre">$</span> whoami
+            </p>
             <p className="text-ink-400 pl-4">Monulph - Front-End Engineer</p>
-            <p><span className="text-accent-ochre">$</span> echo $STATUS</p>
+            <p>
+              <span className="text-accent-ochre">$</span> echo $STATUS
+            </p>
             <p className="text-ink-400 pl-4">🔴 Not Looking for a Job</p>
-            <p><span className="text-accent-ochre">$</span> echo $LOCATION</p>
+            <p>
+              <span className="text-accent-ochre">$</span> echo $LOCATION
+            </p>
             <p className="text-ink-400 pl-4">🌍 Remote / Worldwide</p>
-            <p><span className="text-accent-ochre">$</span> uptime</p>
+            <p>
+              <span className="text-accent-ochre">$</span> uptime
+            </p>
             <p className="text-ink-400 pl-4">5+ years of coding experience</p>
-            <p className="animate-pulse"><span className="text-accent-ochre">$</span> <span className="inline-block w-2 h-4 bg-parchment-100 ml-1" /></p>
+            <p className="animate-pulse">
+              <span className="text-accent-ochre">$</span>{' '}
+              <span className="inline-block w-2 h-4 bg-parchment-100 ml-1" />
+            </p>
           </div>
         </div>
-      </div>
-      <div className="animate-stagger-5 mt-12">
+      </SectionReveal>
+      <SectionReveal className="mt-12" delay={0.25}>
         <h2 className="font-display text-2xl font-semibold text-ink-900 dark:text-parchment-100 mb-6">
           What I Write About
         </h2>
@@ -125,8 +161,8 @@ const AboutPage = () => {
             </div>
           ))}
         </div>
-      </div>
-      <div className="animate-stagger-6 mt-12">
+      </SectionReveal>
+      <SectionReveal className="mt-12" delay={0.3}>
         <h2 className="font-display text-2xl font-semibold text-ink-900 dark:text-parchment-100 mb-6">
           Connect
         </h2>
@@ -143,7 +179,7 @@ const AboutPage = () => {
             GitHub
           </a>
         </div>
-      </div>
+      </SectionReveal>
       <div className="mt-16 flex items-center gap-4" aria-hidden="true">
         <div className="h-px flex-1 bg-gradient-to-r from-accent-terracotta/50 to-transparent dark:from-accent-ochre/50" />
         <span className="text-accent-terracotta dark:text-accent-ochre text-xl">✦ ✦ ✦</span>

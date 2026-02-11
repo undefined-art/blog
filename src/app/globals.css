@@ -7,6 +7,14 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Reserve space for scrollbar to prevent layout shift when it appears/disappears on load */
+    scrollbar-gutter: stable;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   /* Smooth theme transitions */
@@ -14,7 +22,22 @@
   html.theme-transition *,
   html.theme-transition *::before,
   html.theme-transition *::after {
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease !important;
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease,
+      fill 0.3s ease,
+      stroke 0.3s ease,
+      box-shadow 0.3s ease !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.theme-transition,
+    html.theme-transition *,
+    html.theme-transition *::before,
+    html.theme-transition *::after {
+      transition-duration: 0.01ms !important;
+    }
   }
 
   body {
@@ -29,7 +52,7 @@
 }
 
 @layer utilities {
-  /* Animation initial states - prevents flash before animation */
+  /* Animation initial states - used only where CSS animations still apply; no will-change to avoid excessive compositing */
   .animate-fade-in,
   .animate-slide-up,
   .animate-scale-in,
@@ -40,7 +63,20 @@
   .animate-stagger-5,
   .animate-stagger-6 {
     opacity: 0;
-    will-change: opacity, transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-slide-up,
+    .animate-scale-in,
+    .animate-stagger-1,
+    .animate-stagger-2,
+    .animate-stagger-3,
+    .animate-stagger-4,
+    .animate-stagger-5,
+    .animate-stagger-6 {
+      opacity: 1;
+    }
   }
 }
 
@@ -58,6 +94,12 @@
     @apply scale-x-100 origin-left;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .link-underline::after {
+      transition-duration: 0.01ms;
+    }
+  }
+
   .card-hover {
     @apply transition-all duration-300 ease-out;
   }
@@ -65,6 +107,15 @@
   .card-hover:hover {
     @apply -translate-y-1 shadow-lg shadow-ink-900/5;
     @apply dark:shadow-ink-950/50;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-hover {
+      transition-duration: 0.01ms;
+    }
+    .card-hover:hover {
+      transform: none;
+    }
   }
 
   .grain-overlay {
@@ -163,4 +214,3 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-ink-400 dark:bg-ink-500;
 }
-

@@ -1,8 +1,8 @@
 ---
-title: "How the Internet Works: The OSI Model and Its 7 Layers"
-description: "A useful explanation of the seven layers of the OSI model. Recognize the data flow from your application to the physical wire and back."
-date: "2025-12-31"
-tags: ["Networking", "System Design", "Fundamentals"]
+title: 'How the Internet Works: The OSI Model and Its 7 Layers'
+description: 'A useful explanation of the seven layers of the OSI model. Recognize the data flow from your application to the physical wire and back.'
+date: '2025-12-31'
+tags: ['Networking', 'System Design', 'Fundamentals']
 ---
 
 If you've ever wondered how your message gets from your computer to a server halfway around the world, this OSI model is where you start. It's the mental framework that chops down network communication into digestible pieces.
@@ -20,6 +20,7 @@ Here's a quick memory trick: **"Please Do Not Throw Sausage Pizza Away"** — Ph
 This is the foundation — the actual hardware that transmits raw bit streams (1s and 0s) across the network.
 
 **What it does:**
+
 - Converts data into electrical signals, light pulses, or radio waves
 - Defines voltage levels, timing, and physical data rates
 - Handles the physical connection between devices
@@ -33,6 +34,7 @@ When your network isn't working, this is often the first place to check. Is the 
 The data link layer ensures error-free data transfer between two directly connected nodes. It takes the raw bits from the Physical layer and packages them into **frames**.
 
 **What it does:**
+
 - Error detection and correction
 - Adds physical (MAC) addresses of sender and receiver to each frame
 - Controls access to the physical medium
@@ -47,6 +49,7 @@ This is where your device's MAC address comes into play — that unique hardware
 The network layer is responsible for getting data from one host to another, even if they're on completely different networks. This is where **routing** happens.
 
 **What it does:**
+
 - Packet routing — selecting the best path from source to destination
 - Logical addressing (IP addresses)
 - Packet fragmentation and reassembly
@@ -61,6 +64,7 @@ When you type a URL, the network layer figures out how to route your request thr
 The transport layer manages end-to-end communication and data integrity. It decides **how** data gets delivered.
 
 **What it does:**
+
 - Segmentation — breaking data into smaller packets
 - Flow control — ensuring the sender doesn't overwhelm the receiver
 - Error recovery and retransmission
@@ -68,10 +72,10 @@ The transport layer manages end-to-end communication and data integrity. It deci
 
 **Key protocols:**
 
-| Protocol | Reliability | Use Case |
-|----------|-------------|----------|
-| **TCP** | Reliable, ordered | Web browsing, email, file transfer |
-| **UDP** | Fast, no guarantees | Video streaming, gaming, DNS |
+| Protocol | Reliability         | Use Case                           |
+| -------- | ------------------- | ---------------------------------- |
+| **TCP**  | Reliable, ordered   | Web browsing, email, file transfer |
+| **UDP**  | Fast, no guarantees | Video streaming, gaming, DNS       |
 
 TCP is like sending a registered letter — you get confirmation it arrived. UDP is like shouting into a crowd — fast, but no guarantees.
 
@@ -80,6 +84,7 @@ TCP is like sending a registered letter — you get confirmation it arrived. UDP
 The session layer manages the **dialogue** between two devices. It establishes, maintains, and terminates connections.
 
 **What it does:**
+
 - Session establishment, management, and termination
 - Synchronization with checkpoints for long transfers
 - Authentication between communicating devices
@@ -93,6 +98,7 @@ Think of it as the conversation manager — it knows when a conversation starts,
 The presentation layer is the **translator**. It ensures that data sent by one system can be read by another, regardless of their internal formats.
 
 **What it does:**
+
 - Data formatting and encoding (ASCII, JPEG, GIF)
 - Data compression
 - Encryption and decryption
@@ -106,6 +112,7 @@ This is where **encryption** lives. When you see that padlock in your browser, T
 The application layer is what users actually interact with. It's the interface between the network and the applications you use every day.
 
 **What it does:**
+
 - Provides network services directly to end-user applications
 - Handles high-level protocols like HTTP, FTP, SMTP
 - Manages resource sharing and remote file access
@@ -139,15 +146,14 @@ Understanding the OSI model helps you:
 
 ## Quick Reference
 
-| Layer | Name | Key Function | Example |
-|-------|------|--------------|---------|
-| 7 | Application | User interface | HTTP, DNS |
-| 6 | Presentation | Translation, encryption | TLS, JPEG |
-| 5 | Session | Connection management | NetBIOS |
-| 4 | Transport | Reliable delivery | TCP, UDP |
-| 3 | Network | Routing | IP, ICMP |
-| 2 | Data Link | Frame delivery | Ethernet |
-| 1 | Physical | Bit transmission | Cables |
+| Layer | Name         | Key Function            | Example   |
+| ----- | ------------ | ----------------------- | --------- |
+| 7     | Application  | User interface          | HTTP, DNS |
+| 6     | Presentation | Translation, encryption | TLS, JPEG |
+| 5     | Session      | Connection management   | NetBIOS   |
+| 4     | Transport    | Reliable delivery       | TCP, UDP  |
+| 3     | Network      | Routing                 | IP, ICMP  |
+| 2     | Data Link    | Frame delivery          | Ethernet  |
+| 1     | Physical     | Bit transmission        | Cables    |
 
 Next time you're troubleshooting a connection issue or designing a distributed system, think in layers. It makes complex problems much more manageable.
-

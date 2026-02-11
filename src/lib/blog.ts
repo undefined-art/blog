@@ -67,11 +67,10 @@ export { formatDate } from './utils';
 export const getAllTags = (): string[] => {
   const posts = getAllPosts();
   const tagsSet = new Set<string>();
-  
+
   posts.forEach((post) => {
     post.tags.forEach((tag) => tagsSet.add(tag));
   });
-  
+
   return Array.from(tagsSet).sort();
 };
-

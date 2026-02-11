@@ -1,8 +1,8 @@
 ---
-title: "PostgreSQL performance tricks and their hidden costs"
-description: "Speed up your database queries with prepared statements, indexing, partitioning, bulk imports, and replication. Learn when each technique shines—and when it backfires."
-date: "2026-01-11"
-tags: ["PostgreSQL", "Databases", "Performance", "Backend"]
+title: 'PostgreSQL performance tricks and their hidden costs'
+description: 'Speed up your database queries with prepared statements, indexing, partitioning, bulk imports, and replication. Learn when each technique shines—and when it backfires.'
+date: '2026-01-11'
+tags: ['PostgreSQL', 'Databases', 'Performance', 'Backend']
 ---
 
 Your queries are slow. Your users are complaining. You've heard about indexing, partitioning, and other magic words that supposedly fix everything. But here's the thing nobody tells you upfront: **every optimization comes with a trade-off.**
@@ -17,7 +17,7 @@ Every time you run a SQL query, PostgreSQL goes through two steps: **planning** 
 
 ```sql
 -- Create a reusable prepared statement
-PREPARE insert_event AS 
+PREPARE insert_event AS
 INSERT INTO events (name, timestamp, payload)
 VALUES ($1, $2, $3);
 
@@ -59,13 +59,13 @@ Indexes also consume **disk space** and require periodic maintenance (think `VAC
 
 **Index Types to Know:**
 
-| Index Type | Best For | Example Use Case |
-|------------|----------|------------------|
-| **B-tree** | Equality and range queries | `WHERE age > 25` |
-| **Hash** | Exact equality only | `WHERE id = 123` |
-| **GIN** | Full-text search, arrays, JSONB | `WHERE tags @> '{postgres}'` |
-| **GiST** | Geometric data, ranges | PostGIS spatial queries |
-| **BRIN** | Very large tables with natural ordering | Time-series data |
+| Index Type | Best For                                | Example Use Case             |
+| ---------- | --------------------------------------- | ---------------------------- |
+| **B-tree** | Equality and range queries              | `WHERE age > 25`             |
+| **Hash**   | Exact equality only                     | `WHERE id = 123`             |
+| **GIN**    | Full-text search, arrays, JSONB         | `WHERE tags @> '{postgres}'` |
+| **GiST**   | Geometric data, ranges                  | PostGIS spatial queries      |
+| **BRIN**   | Very large tables with natural ordering | Time-series data             |
 
 **Pro Tip:** Use `EXPLAIN ANALYZE` to see if your queries are actually using your indexes. PostgreSQL might ignore them if it thinks a sequential scan is faster.
 
@@ -84,11 +84,11 @@ CREATE TABLE events (
 ) PARTITION BY RANGE (created_at);
 
 -- Create individual partitions for each time range
-CREATE TABLE events_2025_01 
+CREATE TABLE events_2025_01
 PARTITION OF events
 FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
 
-CREATE TABLE events_2025_02 
+CREATE TABLE events_2025_02
 PARTITION OF events
 FOR VALUES FROM ('2025-02-01') TO ('2025-03-01');
 
@@ -151,13 +151,13 @@ This follows the **separation of concerns** principle—reads and writes have di
 
 ## Quick Reference
 
-| Technique | Best For | Watch Out For |
-|-----------|----------|---------------|
-| **Prepared Statements** | Repeated similar queries | Session-scoped, often automatic |
-| **Indexing** | Search and filter queries | Write overhead, disk space |
-| **Partitioning** | Massive time-series tables | Cross-partition queries, maintenance |
-| **COPY** | Bulk data imports | All-or-nothing, server-side files |
-| **Replication** | Read-heavy scaling | Lag, operational complexity |
+| Technique               | Best For                   | Watch Out For                        |
+| ----------------------- | -------------------------- | ------------------------------------ |
+| **Prepared Statements** | Repeated similar queries   | Session-scoped, often automatic      |
+| **Indexing**            | Search and filter queries  | Write overhead, disk space           |
+| **Partitioning**        | Massive time-series tables | Cross-partition queries, maintenance |
+| **COPY**                | Bulk data imports          | All-or-nothing, server-side files    |
+| **Replication**         | Read-heavy scaling         | Lag, operational complexity          |
 
 ## The Takeaway
 
@@ -169,4 +169,3 @@ There's no free lunch in database optimization. Every technique that speeds up o
 - Simple repeated queries? Let your driver handle prepared statements.
 
 Start with the simplest solution that might work. Profile with `EXPLAIN ANALYZE`. Add complexity only when the numbers prove you need it.
-

@@ -1,0 +1,16 @@
+# Blog (undefined-art)
+Copyright (c) 2026 undefined-art
+
+This product includes third-party software that is distributed under their
+respective licenses. Principal dependencies and their licenses:
+
+- Next.js — MIT License (https://nextjs.org)
+- React — MIT License (https://reactjs.org)
+- Tailwind CSS — MIT License (https://tailwindcss.com)
+- MDX / remark / rehype — MIT License (https://mdxjs.com, https://remark.js.org)
+- TypeScript — Apache-2.0 License (https://www.typescriptlang.org)
+- Vitest — MIT License (https://vitest.dev)
+- ESLint — MIT License (https://eslint.org)
+
+For the complete and authoritative license texts, refer to the individual
+package repositories and `package-lock.json`.

@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: monthly
+    groups:
+      production-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+        dependency-type: production
+      dev-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+        dependency-type: development
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: monthly

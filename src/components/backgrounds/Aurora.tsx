@@ -120,15 +120,6 @@ export type AuroraProps = {
 const DEFAULT_COLOR_STOPS: [string, string, string] = ['#5a3a6b', '#cc8b3c', '#6b8f71'];
 
 export const Aurora = (props: AuroraProps) => {
-  const {
-    colorStops = DEFAULT_COLOR_STOPS,
-    amplitude = 1.0,
-    blend = 0.5,
-    speed = 1.0,
-    className = '',
-  } = props;
-  const propsRef = useRef(props);
-  propsRef.current = props;
   const ctnDom = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -139,12 +130,20 @@ export const Aurora = (props: AuroraProps) => {
       alpha: true,
       premultipliedAlpha: true,
       antialias: true,
+      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      powerPreference: 'high-performance',
     });
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 0);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     (gl.canvas as HTMLCanvasElement).style.backgroundColor = 'transparent';
+
+    // Color stops are parsed once here (not per frame) and mutated in place
+    // when the props change, avoiding per-frame allocations.
+    const stops = props.colorStops ?? DEFAULT_COLOR_STOPS;
+    const stopColors = stops.map((hex) => new Color(hex));
+    const toRgb = () => stopColors.map((color) => [color.r, color.g, color.b]);
 
     let program: Program | undefined;
 
@@ -164,20 +163,15 @@ export const Aurora = (props: AuroraProps) => {
       delete geometry.attributes.uv;
     }
 
-    const colorStopsArray = colorStops.map((hex) => {
-      const c = new Color(hex);
-      return [c.r, c.g, c.b];
-    });
-
     program = new Program(gl, {
       vertex: VERT,
       fragment: FRAG,
       uniforms: {
         uTime: { value: 0 },
-        uAmplitude: { value: amplitude },
-        uColorStops: { value: colorStopsArray },
+        uAmplitude: { value: props.amplitude ?? 1.0 },
+        uColorStops: { value: toRgb() },
         uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
-        uBlend: { value: blend },
+        uBlend: { value: props.blend ?? 0.5 },
       },
     });
 
@@ -185,38 +179,61 @@ export const Aurora = (props: AuroraProps) => {
     ctn.appendChild(gl.canvas);
 
     let animateId = 0;
+
     const update = (t: number) => {
       animateId = requestAnimationFrame(update);
-      const { speed: s = 1.0 } = propsRef.current;
-      if (program) {
-        program.uniforms.uTime.value = t * 0.01 * s * 0.1;
-        program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0;
-        program.uniforms.uBlend.value = propsRef.current.blend ?? blend;
-        const stops = propsRef.current.colorStops ?? colorStops;
-        program.uniforms.uColorStops.value = stops.map((hex: string) => {
-          const c = new Color(hex);
-          return [c.r, c.g, c.b];
-        });
-        renderer.render({ scene: mesh });
-      }
+      if (!program) return;
+
+      program.uniforms.uTime.value = t * 0.001 * (props.speed ?? 1.0);
+      program.uniforms.uAmplitude.value = props.amplitude ?? 1.0;
+      program.uniforms.uBlend.value = props.blend ?? 0.5;
+      stopColors.forEach((color, index) => {
+        const hex = (props.colorStops ?? DEFAULT_COLOR_STOPS)[index];
+        color.set(hex);
+      });
+      program.uniforms.uColorStops.value = toRgb();
+      renderer.render({ scene: mesh });
     };
-    animateId = requestAnimationFrame(update);
+
+    const start = () => {
+      cancelAnimationFrame(animateId);
+      animateId = requestAnimationFrame(update);
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) start();
+    };
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      update(0);
+      cancelAnimationFrame(animateId);
+    } else {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      start();
+    }
+
     resize();
 
     return () => {
       cancelAnimationFrame(animateId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('resize', resize);
       if (ctn && gl.canvas.parentNode === ctn) {
         ctn.removeChild(gl.canvas);
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [amplitude, blend, colorStops, speed]);
+    // Mount-only: props are read through the closure on every frame, so the
+    // WebGL context is created once and never re-initialized on re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
       ref={ctnDom}
-      className={`absolute inset-0 w-full h-full ${className}`}
+      className={`absolute inset-0 w-full h-full ${props.className ?? ''}`}
       aria-hidden="true"
     />
   );

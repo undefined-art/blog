@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
+import { fadeIn, staggerContainer } from '@/components/motion/variants';
 
 const techBadges = [
   { name: 'Next.js', color: 'from-neutral-500/20 to-neutral-600/20 border-neutral-500/30' },
@@ -12,51 +13,31 @@ const techBadges = [
   { name: 'Playwright', color: 'from-teal-500/20 to-teal-600/20 border-teal-500/30' },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
-
 const HomePage = () => {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16 md:py-12 flex flex-col items-center justify-center min-h-[70vh]">
       <motion.div
         className="text-center"
-        variants={containerVariants}
+        variants={staggerContainer(0.08, 0.1)}
         initial="hidden"
         animate="visible"
       >
         <motion.h1
           className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-ink-900 dark:text-parchment-100 leading-tight"
-          variants={itemVariants}
+          variants={fadeIn(20, 0.5)}
         >
           undefined-art
         </motion.h1>
         <motion.p
           className="mt-6 text-xl md:text-2xl text-ink-600 dark:text-parchment-400 max-w-xl mx-auto"
-          variants={itemVariants}
+          variants={fadeIn(20, 0.5)}
         >
           Front-End Engineer. Code enthusiast. <br className="hidden md:block" />
           Building beautiful web experiences.
         </motion.p>
         <motion.div
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-          variants={itemVariants}
+          variants={fadeIn(20, 0.5)}
         >
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Link
@@ -93,23 +74,24 @@ const HomePage = () => {
 
       <motion.div
         className="mt-12 text-center"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
+        variants={fadeIn(16, 0.5)}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.7 }}
       >
         <p className="text-sm text-ink-400 dark:text-ink-500 uppercase tracking-wider mb-6">
           Tech Stack
         </p>
         <motion.div
           className="flex flex-wrap items-center justify-center gap-3"
-          variants={containerVariants}
+          variants={staggerContainer(0.08, 0.1)}
           initial="hidden"
           animate="visible"
         >
           {techBadges.map((tech) => (
             <motion.span
               key={tech.name}
-              variants={itemVariants}
+              variants={fadeIn(20, 0.5)}
               className={`px-4 py-2 rounded-xl bg-gradient-to-br ${tech.color} border text-ink-700 dark:text-parchment-200 text-sm font-medium backdrop-blur-sm`}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}

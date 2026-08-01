@@ -1,3 +1,5 @@
+import { BASE_PATH } from './site';
+
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
 
@@ -7,8 +9,6 @@ export const formatDate = (dateString: string): string => {
     day: 'numeric',
   });
 };
-
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/blog';
 
 export const resolveAssetPath = (path: string): string => {
   if (

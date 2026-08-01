@@ -4,16 +4,17 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuroraBackground } from '@/components/backgrounds/AuroraBackground';
+import { SITE_DESCRIPTION, SITE_TITLE } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: {
-    default: 'undefined-art',
-    template: '%s | undefined-art',
+    default: SITE_TITLE,
+    template: `%s | ${SITE_TITLE}`,
   },
-  description: 'Thoughts, code, and creative experiments by undefined-art.',
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: 'undefined-art',
-    description: 'Thoughts, code, and creative experiments by undefined-art.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: 'website',
     locale: 'en_US',
   },

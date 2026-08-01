@@ -1,12 +1,16 @@
-import { getAllPosts } from './blog';
+import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from './site';
+import { getAllPosts } from './content/posts';
+import type { BlogPostMeta } from './types';
 
-const SITE_URL = 'https://undefined-art.github.io';
-const SITE_TITLE = 'undefined-art';
-const SITE_DESCRIPTION = 'Thoughts, code, and creative experiments by undefined-art.';
+const escapeXml = (text: string): string =>
+  text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 
-export const generateRssFeed = (): string => {
-  const posts = getAllPosts();
-
+export const generateRssFeed = (posts: BlogPostMeta[] = getAllPosts()): string => {
   const itemsXml = posts
     .map((post) => {
       const postUrl = `${SITE_URL}/articles/${post.slug}/`;
@@ -17,9 +21,9 @@ export const generateRssFeed = (): string => {
       <title><![CDATA[${post.title}]]></title>
       <link>${postUrl}</link>
       <guid isPermaLink="true">${postUrl}</guid>
-      <description><![CDATA[${post.description}]]></description>
+      <description><![CDATA[${escapeXml(post.description)}]]></description>
       <pubDate>${pubDate}</pubDate>
-      ${post.tags.map((tag) => `<category>${tag}</category>`).join('\n      ')}
+      ${post.tags.map((tag) => `<category>${escapeXml(tag)}</category>`).join('\n      ')}
     </item>`;
     })
     .join('');
@@ -27,9 +31,9 @@ export const generateRssFeed = (): string => {
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>${SITE_TITLE}</title>
+    <title>${escapeXml(SITE_TITLE)}</title>
     <link>${SITE_URL}</link>
-    <description>${SITE_DESCRIPTION}</description>
+    <description>${escapeXml(SITE_DESCRIPTION)}</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml"/>

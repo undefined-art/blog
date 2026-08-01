@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { getAllPosts, getAllTags } from '@/lib/blog';
-import { ArticlesList } from '@/components/ArticlesList';
+import { getAllPosts, getAllTags } from '@/lib/content/posts';
+import { ArticlesList } from '@/components/articles/ArticlesList';
 
 export const metadata: Metadata = {
   title: 'Articles',

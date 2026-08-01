@@ -2,9 +2,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { getAllPosts, getPostBySlug, formatDate } from '@/lib/blog';
-import { resolveAssetPath } from '@/lib/utils';
-import { MDXContent } from '@/components/MDXContent';
+import { getAllPosts, getPostBySlug } from '@/lib/content/posts';
+import { markdownToReact } from '@/lib/content/markdown';
+import { formatDate, resolveAssetPath } from '@/lib/utils';
 import { ArticlePageMotion } from '@/components/ArticlePageMotion';
 
 type PageProps = {
@@ -106,6 +106,7 @@ const ArticlePage = async ({ params }: PageProps) => {
                   src={resolveAssetPath(post.image)}
                   alt={post.title}
                   fill
+                  priority
                   className="object-cover"
                   sizes="(max-width: 896px) 100vw, 896px"
                 />
@@ -118,7 +119,7 @@ const ArticlePage = async ({ params }: PageProps) => {
             </div>
           </header>
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <MDXContent content={post.content} />
+            {markdownToReact(post.content)}
           </div>
           <footer className="mt-16">
             <div className="flex items-center gap-4 mb-8" aria-hidden="true">

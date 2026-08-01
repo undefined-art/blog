@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'motion/react';
 import { useRef } from 'react';
+import { EASE } from '@/components/motion/variants';
 
 type SectionRevealProps = {
   children: React.ReactNode;
@@ -22,7 +23,7 @@ export const SectionReveal = ({ children, className = '', delay = 0 }: SectionRe
       transition={{
         duration: 0.5,
         delay,
-        ease: [0.16, 1, 0.3, 1] as const,
+        ease: EASE,
       }}
     >
       {children}

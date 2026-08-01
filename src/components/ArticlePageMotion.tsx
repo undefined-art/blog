@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
+import { fadeIn } from '@/components/motion/variants';
 
 type ArticlePageMotionProps = {
   children: React.ReactNode;
@@ -8,11 +9,7 @@ type ArticlePageMotionProps = {
 
 export const ArticlePageMotion = ({ children }: ArticlePageMotionProps) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
-    >
+    <motion.div variants={fadeIn(16, 0.5)} initial="hidden" animate="visible">
       {children}
     </motion.div>
   );

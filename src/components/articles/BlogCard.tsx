@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import { formatDate, resolveAssetPath } from '@/lib/utils';
+import { cardReveal } from '@/components/motion/variants';
 import type { BlogPostMeta } from '@/lib/types';
 
 type BlogCardProps = {
@@ -11,25 +12,12 @@ type BlogCardProps = {
   index?: number;
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.06,
-      duration: 0.4,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  }),
-};
-
 export const BlogCard = ({ post, index = 0 }: BlogCardProps) => {
   return (
     <motion.article
       className="group"
       custom={index}
-      variants={cardVariants}
+      variants={cardReveal()}
       initial="hidden"
       animate="visible"
       whileHover={{ y: -4 }}

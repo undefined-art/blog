@@ -1,78 +1,119 @@
-## 🚀 Quick Start
+# ✦ undefined-art — Blog
+
+[![CI](https://github.com/undefined-art/blog/actions/workflows/ci.yml/badge.svg)](https://github.com/undefined-art/blog/actions/workflows/ci.yml)
+[![Deploy](https://github.com/undefined-art/blog/actions/workflows/deploy.yml/badge.svg)](https://github.com/undefined-art/blog/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+A static, SEO-friendly developer blog built with **Next.js 16 (App Router)**, **MDX/remark** and **Tailwind CSS**. Content lives in version-controlled `.mdx` files, and the site is fully prerendered and deployed to GitHub Pages.
+
+## ✨ Features
+
+- Static generation (`output: export`) — zero server, instant TTFB
+- Client-side article search, tag filtering, sorting and pagination
+- Syntax-highlighted code blocks, GFM tables, footnotes-friendly headings with anchor links
+- RSS 2.0 feed (`/rss.xml`)
+- Dark/light theme with local persistence
+- WebGL aurora background (pauses when the tab is hidden, respects `prefers-reduced-motion`)
+- Full quality gate: typecheck, lint, format, unit tests, dependency audit
+
+## 🏗️ Architecture
+
+```mermaid
+graph LR
+    A["/articles"] --> B["lib/content/posts.ts"]
+    B --> C["content/*.mdx"]
+    D["/articles/[slug]"] --> B
+    D --> E["lib/content/markdown.tsx"]
+    E --> F["remark-parse + remark-gfm"]
+    F --> G["rehype-slug + rehype-highlight"]
+    G --> H["rehype-sanitize"]
+    H --> I["rehype-react (React elements)"]
+    J["/rss.xml"] --> K["lib/rss.ts"]
+    K --> B
+```
+
+- **`src/lib/content/posts.ts`** — cached content repository: reads and parses every article exactly once per build.
+- **`src/lib/content/frontmatter.ts`** — Zod-validated frontmatter; a malformed article fails the build loudly.
+- **`src/lib/content/markdown.tsx`** — server-side markdown → React pipeline with built-in sanitization (no `dangerouslySetInnerHTML`, no client-side parsing).
+- **`src/components/articles/`** — presentational components driven by the `useArticleFilters` hook.
+
+## 🚀 Getting Started
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000/blog/](http://localhost:3000/blog/) to see your blog.
+Open [http://localhost:3000/blog/](http://localhost:3000/blog/).
 
-## 📝 Writing Articles
+## ✍️ Writing an Article
 
-Create new articles in the `content/articles/` directory:
+Use the scaffolder (interactive or flag-based):
+
+```bash
+npm run new -- -t "My Title" -d "Short description" --tags "web,dev"
+```
+
+Or create `content/articles/<slug>.mdx` manually:
 
 ```mdx
 ---
-title: "Title"
-description: "A brief description"
-date: "2001-01-01"
-tags: ["Tag1", "Tag2"]
-image: "/images/cover.jpg" // Place images in the `public/images/` folder
+title: 'My Title'
+description: 'A brief description'
+date: '2026-01-01'
+tags: ['web', 'dev']
+image: '/images/cover.jpg' # optional; place files in public/images/
 ---
 
-Your markdown content here...
+Your markdown content here. Supports headings, lists, tables, code fences,
+blockquotes, images and **inline** formatting. Links open in a new tab.
 ```
 
-## 🚀 Deploy to GitHub Pages
+### Frontmatter fields
 
-### Step 1: Create Repository
+| Field         | Type         | Required | Default |
+| ------------- | ------------ | -------- | ------- |
+| `title`       | `string`     | ✅       | —       |
+| `description` | `string`     | —        | `""`    |
+| `date`        | `YYYY-MM-DD` | —        | today   |
+| `tags`        | `string[]`   | —        | `[]`    |
+| `image`       | `string`     | —        | none    |
 
-1. Go to [github.com/new](https://github.com/new)
-2. Create a new repository named `blog` (or any name you prefer)
-3. Keep it public for GitHub Pages
+## 🔍 Public API
 
-### Step 2: Push Code
+| Endpoint            | Description                                  |
+| ------------------- | -------------------------------------------- |
+| `GET /blog/rss.xml` | RSS 2.0 feed of all articles (cached 1 hour) |
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/{username}/blog.git
-git push -u origin main
-```
+## 🧰 Scripts
 
-### Step 3: Enable GitHub Pages
+| Command                | Description                         |
+| ---------------------- | ----------------------------------- |
+| `npm run dev`          | Development server                  |
+| `npm run build`        | Production build (static export)    |
+| `npm run typecheck`    | TypeScript type check               |
+| `npm run lint:check`   | ESLint (flat config, Next.js rules) |
+| `npm run format:check` | Prettier check                      |
+| `npm test`             | Vitest unit tests                   |
+| `npm run audit`        | npm security audit (high severity)  |
+| `npm run new`          | Scaffold a new article              |
 
-1. Go to your repository: `https://github.com/{username}/blog`
-2. Click **Settings** → **Pages**
-3. Under "Build and deployment", select **GitHub Actions**
-4. The workflow will auto-deploy on every push!
+Quality gates run automatically on every commit (Husky + lint-staged + commitlint) and in CI.
 
-Your blog will be live at: **https://{username}.github.io/blog/**
+## 🚢 Deployment
 
----
+Pushes to `main` deploy via [GitHub Actions](.github/workflows/deploy.yml) to GitHub Pages at **https://undefined-art.github.io/blog/**.
 
-### Alternative: Root Domain ({username}.github.io)
+The workflow: typecheck → lint → format check → tests → build → publish the `out/` artifact. The site is served under the `/blog` base path (see `next.config.mjs` and `src/lib/site.ts`).
 
-If you want the blog at the root URL `{username}.github.io`:
+## 🧱 Tech Stack
 
-1. Name the repository `{username}.github.io`
-2. Update `next.config.mjs`:
+![Next.js](https://img.shields.io/badge/Next.js%2016-000000?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white)
+![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-222222?logo=githubpages&logoColor=white)
 
-```javascript
-const nextConfig = {
-  output: 'export',
-  images: { unoptimized: true },
-  trailingSlash: true,
-};
-```
+## 📄 License
 
-3. Push and the blog will be at `https://{username}.github.io/`
-
----
-
-Built with ❤️ and ☕ by [undefined-art](https://github.com/undefined-art)
+MIT — see [LICENSE](LICENSE).

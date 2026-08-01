@@ -4,15 +4,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTheme } from './ThemeProvider';
 import { useState } from 'react';
-
-const navItemVariants = {
-  hidden: { opacity: 0, y: -8 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.05, duration: 0.3, ease: [0.16, 1, 0.3, 1] as const },
-  }),
-};
+import { navItemReveal } from '@/components/motion/variants';
 
 const menuTransition = { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const };
 
@@ -54,7 +46,7 @@ export const Header = () => {
           </motion.div>
           <div className="flex items-center gap-2 md:gap-8">
             <div className="hidden md:flex items-center gap-8">
-              <motion.div custom={0} variants={navItemVariants} initial="hidden" animate="visible">
+              <motion.div custom={0} variants={navItemReveal()} initial="hidden" animate="visible">
                 <Link
                   href="/articles/"
                   className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
@@ -62,7 +54,7 @@ export const Header = () => {
                   Articles
                 </Link>
               </motion.div>
-              <motion.div custom={1} variants={navItemVariants} initial="hidden" animate="visible">
+              <motion.div custom={1} variants={navItemReveal()} initial="hidden" animate="visible">
                 <Link
                   href="/about/"
                   className="link-underline text-ink-600 dark:text-parchment-300 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors duration-200"
@@ -73,7 +65,7 @@ export const Header = () => {
             </div>
             <motion.div
               custom={2}
-              variants={navItemVariants}
+              variants={navItemReveal()}
               initial="hidden"
               animate="visible"
               whileTap={{ scale: 0.92 }}

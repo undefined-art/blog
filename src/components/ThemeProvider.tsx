@@ -29,6 +29,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Client-only hydration pattern: mark mounted and restore the persisted
+    // theme exactly once. This is the documented Next.js theme-provider
+    // approach; the sync setState here is intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const savedTheme = localStorage.getItem('theme') as Theme | null;
 
